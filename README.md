@@ -16,7 +16,7 @@
 - [Data Layout](#data-layout)
 - [Configs](#configs)
 - [Training](#training)
-- [Evaluation (two test sets)](#evaluation-two-test-sets)
+- [Evaluation](#evaluation)
 - [Inference](#inference)
 - [Reproducibility & Environment](#reproducibility--environment)
 - [Troubleshooting](#troubleshooting)
@@ -131,7 +131,6 @@ Each config:
 - Imports the **backbone** from `mmseg/custom_models/mamba_vision.py`
 - Imports the **U‑Net head** from `mmseg/custom_models/generic_unet_head.py`
 - Uses the **custom dataset base** (not ADE20K) and defines your `classes/palette`
-- Provides two test dataloaders (`test` and `Generalizability`) or you can override paths via `--cfg-options`
 
 > If your files live under `mmseg/custom_models/`, include in the config:
 > ```python
@@ -166,7 +165,7 @@ Tips:
 
 ---
 
-## Evaluation (two test sets)
+## Evaluation
 
 If your config defines **two** `test_dataloader` entries for `test` and `Generalizability`, a single command evaluates both:
 
@@ -174,32 +173,34 @@ If your config defines **two** `test_dataloader` entries for `test` and `General
 python tools/test.py   configs/mambavision/U-MV-small.py   work_dirs/U-MV-small/latest.pth --eval mIoU mFscore
 ```
 
-MMSeg prints separate metrics with prefixes (e.g., `test/mIoU` for in‑distribution, `ood/mIoU` for Generalizability).
-
-Evaluate a specific split by overriding paths:
-```bash
-# OOD only
-python tools/test.py   configs/mambavision/U-MV-small.py   work_dirs/U-MV-small/latest.pth --eval mIoU mFscore   --cfg-options   test_dataloader.dataset.data_prefix.img_path=img_dir/Generalizability   test_dataloader.dataset.data_prefix.seg_map_path=ann_dir/Generalizability
-```
-
 ---
 
 ## Inference
 
-Single image or folder (writes overlays to `--out-dir`):
+This project includes **two geospatial inference utilities** that post-process predictions into GIS vector formats (GeoPackage / Shapefile). They assume **georeferenced** source imagery (e.g., GeoTIFF) and require geospatial libs (see `extras/geo-requirements.txt` if provided).
 
+### A) Single image
 ```bash
-# Standard MMSeg image demo
-python demo/image_demo.py   path/to/image_or_folder   configs/mambavision/U-MV-small.py   --device cuda:0   --opacity 0.0   --out-dir outputs/vis
+python tools/geospatial_inference.py  
 ```
+**What it does**
+1. Runs tile-wise inference over large imagery (sliding window if needed).  
+2. Reassembles a full-size raster mask in the image CRS.  
+3. Vectorizes polygons (e.g., crowns), optionally filters small objects.  
+4. Writes a **GeoPackage** (`.gpkg`) or **ESRI Shapefile** (`.shp`).
 
-> If you provide a custom script such as `tools/geospatial_inference.py`, document its arguments in `docs/usage.md`.
-
+### B) Batch processing (folders of images)
+```bash
+python tools/Batch_processing_geospatial_inference.py   
+```
+**Notes**
+- The script walks subfolders and processes each georeferenced image.  
+- Output vector files mirror the input folder structure.  
 ---
 
 ## Reproducibility & Environment
 
-You can include exact environment exports used during training (optional but reviewer-friendly). From your container (replace `mvmmseg` with your name/id):
+Export your exact environment (optional but reviewer‑friendly). From your container (replace `mvmmseg` with your name/id):
 
 ```bash
 docker exec mvmmseg pip freeze > requirements_full.txt
@@ -213,7 +214,7 @@ print('cudnn', torch.backends.cudnn.version())
 PY
 ```
 
-Commit these files for transparency; keep the top-level `requirements.txt` minimal and pip-installable.
+Commit these files for transparency; keep the top-level `requirements.txt` minimal and pip‑installable.
 
 ---
 
@@ -259,4 +260,6 @@ Specify your license (e.g., **Apache-2.0**) in `LICENSE`.
 
 ## Acknowledgments
 
-Built with **MMSegmentation** and MambaVision backbones via **Hugging Face Transformers**. Thanks to the OpenMMLab community.
+- Built on **MMSegmentation** by OpenMMLab: <https://github.com/open-mmlab/mmsegmentation>  
+- Uses **MambaVision** backbones by NVLabs: <https://github.com/NVlabs/MambaVision>  
+- Model weights are loaded via **Hugging Face Transformers**.
