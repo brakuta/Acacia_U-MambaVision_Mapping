@@ -196,41 +196,7 @@ python tools/Batch_processing_geospatial_inference.py
 **Notes**
 - The script walks subfolders and processes each georeferenced image.  
 - Output vector files mirror the input folder structure.  
----
 
-## Reproducibility & Environment
-
-Export your exact environment (optional but reviewer‑friendly). From your container (replace `mvmmseg` with your name/id):
-
-```bash
-docker exec mvmmseg pip freeze > requirements_full.txt
-docker exec mvmmseg conda env export --no-builds > environment.yml || true
-docker exec mvmmseg bash -lc 'nvcc --version > cuda.txt || true'
-docker exec mvmmseg python - <<'PY'
-import torch
-print('torch', torch.__version__)
-print('cuda', torch.version.cuda)
-print('cudnn', torch.backends.cudnn.version())
-PY
-```
-
-Commit these files for transparency; keep the top-level `requirements.txt` minimal and pip‑installable.
-
----
-
-## Troubleshooting
-
-- **Module not found** (`mmseg.custom_models...`)  
-  Ensure you ran `pip install -v -e .` **inside `mmsegmentation/`** and that `custom_models/__init__.py` exists.
-
-- **CUDA mismatch**  
-  Install the PyTorch wheel that matches your CUDA/driver using the correct `--index-url`.
-
-- **Mask format errors**  
-  Masks must be **indexed** (class IDs per pixel), not RGB color masks.
-
-- **Tiny channels differ**  
-  If backbone variant changes, update `encoder_channels` in the config to match the backbone’s feature dims.
 
 ---
 
@@ -262,4 +228,4 @@ Specify your license (e.g., **Apache-2.0**) in `LICENSE`.
 
 - Built on **MMSegmentation** by OpenMMLab: <https://github.com/open-mmlab/mmsegmentation>  
 - Uses **MambaVision** backbones by NVLabs: <https://github.com/NVlabs/MambaVision>  
-- Model weights are loaded via **Hugging Face Transformers**: https://huggingface.co/nvidia
+- Model weights are loaded via **Hugging Face Transformers**: <https://huggingface.co/nvidia>
