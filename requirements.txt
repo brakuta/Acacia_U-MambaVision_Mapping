@@ -1,0 +1,37 @@
+# Core DL stack (CUDA 11.8 build)
+torch==2.6.0+cu118
+torchvision==0.21.0+cu118
+torchaudio==2.6.0+cu118
+triton==3.2.0
+
+# OpenMMLab core
+mmengine==0.10.7
+mmcv==2.1.0
+
+# Backbones / HF
+timm==1.0.15
+transformers==4.50.0
+huggingface-hub==0.30.2
+tokenizers==0.21.1
+einops==0.8.1
+kornia==0.6.0
+
+# MambaVision
+mambavision==1.1.0
+
+
+# Utilities
+opencv-python==4.11.0.86
+numpy==2.2.2
+scipy==1.15.2
+scikit-image==0.25.2
+scikit-learn==1.6.1
+pillow==11.1.0
+matplotlib==3.10.3
+seaborn==0.13.2
+tqdm==4.65.2
+prettytable==3.16.0
+tensorboardX==2.6.2.2
+yacs==0.1.8
+omegaconf==2.1.1
+grad-cam==1.5.5
