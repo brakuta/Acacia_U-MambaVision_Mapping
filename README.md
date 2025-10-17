@@ -262,4 +262,4 @@ Specify your license (e.g., **Apache-2.0**) in `LICENSE`.
 
 - Built on **MMSegmentation** by OpenMMLab: <https://github.com/open-mmlab/mmsegmentation>  
 - Uses **MambaVision** backbones by NVLabs: <https://github.com/NVlabs/MambaVision>  
-- Model weights are loaded via **Hugging Face Transformers**.
+- Model weights are loaded via **Hugging Face Transformers**: https://huggingface.co/nvidia
