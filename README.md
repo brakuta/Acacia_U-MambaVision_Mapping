@@ -102,7 +102,7 @@ uav_acacia/
 ```
 
 - **Images**: `.tif` or common image formats readable by MMSeg.  
-- **Masks**: **indexed** `.png` with per‑pixel class IDs (not RGB).  
+- **Masks**: **indexed** `.tif` or '.png' with per‑pixel class IDs (not RGB).  
 - **Classes (binary)**: `0 = background`, `1 = acacia` (adjust if needed).
 
 In your configs, set (example):
@@ -128,17 +128,7 @@ Each config:
 - Imports the **backbone** from `mmseg/custom_models/mamba_vision.py`
 - Imports the **U‑Net head** from `mmseg/custom_models/generic_unet_head.py`
 - Uses the **custom dataset base** (not ADE20K) and defines your `classes/palette`
-- Sets `num_classes=2` and wires **two test sets** (`test` and `Generalizability`)
 
-> If your files are inside `mmseg/custom_models/`, the config must include:
-> ```python
-> custom_imports = dict(
->     imports=[
->         'mmseg.custom_models.mamba_vision',
->         'mmseg.custom_models.generic_unet_head',
->     ],
->     allow_failed_imports=False
-> )
 > ```
 
 ---
@@ -186,46 +176,11 @@ python tools/test.py   configs/mambavision/U-MV-small.py   work_dirs/U-MV-small/
 Single image or folder (writes overlays to `--out-dir`):
 
 ```bash
-python demo/image_demo.py   path/to/image_or_folder   configs/mambavision/U-MV-small.py   --device cuda:0   --opacity 0.0   --out-dir outputs/vis
+python tools/geospatial_inference.py
 ```
 
----
 
-## Reproducibility & Environment
 
-You can include exact environment exports used during training (optional but reviewer‑friendly). From your container (replace `mvmmseg` with your name/id):
-
-```bash
-docker exec mvmmseg pip freeze > requirements_full.txt
-docker exec mvmmseg conda env export --no-builds > environment.yml || true
-docker exec mvmmseg bash -lc 'nvcc --version > cuda.txt || true'
-docker exec mvmmseg python - <<'PY'
-import torch
-print('torch', torch.__version__)
-print('cuda', torch.version.cuda)
-print('cudnn', torch.backends.cudnn.version())
-PY
-```
-
-Commit these files for transparency; keep the top‑level `requirements.txt` minimal and pip‑installable.
-
----
-
-## Troubleshooting
-
-- **Module not found** (`mmseg.custom_models...`)  
-  Ensure you ran `pip install -v -e .` **inside `mmsegmentation/`** and that `custom_models/__init__.py` exists.
-
-- **CUDA mismatch**  
-  Install the PyTorch wheel that matches your CUDA/driver using the correct `--index-url`.
-
-- **Mask format errors**  
-  Masks must be **indexed PNGs** with integer class IDs (not RGB colors).
-
-- **Tiny channels differ**  
-  If backbone variant changes, update `encoder_channels` in the config to match the backbone’s feature dims.
-
----
 
 ## Citation
 
@@ -237,7 +192,7 @@ If you use this repository, please cite:
 ```bibtex
 @article{Barakat2025AcaciaUAVMambaVision,
   title   = {Regional-Scale Acacia tortilis Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework},
-  author  = {Barakat, Mohamed and Others},
+  author  = {Gibril, MBA and Others},
   year    = {2025},
   journal = {TBD}
 }
