@@ -1,87 +1,101 @@
+readme_content = """
 # Regional-Scale *Acacia tortilis* Crown Mapping from UAV Imagery (U-MV)
 
-**U-Shape-MambaVision** — A custom U-Net–style decoder with a **MambaVision** backbone for semantic segmentation of *Acacia tortilis* crowns in ultra‑high‑resolution UAV images. Built on **MMSegmentation**.
+**U-MV (U-Shape-MambaVision)** — A lightweight U-shaped semantic segmentation framework (U-Net–style decoder + **MambaVision** backbone) for delineating *Acacia tortilis* crowns in ultra-high-resolution UAV imagery. Built on **MMSegmentation**.
 
-> **Highlights**
-> - Plug‑in backbone via Hugging Face (`nvidia/MambaVision-*-1K`)
-> - Simple U‑Net decoder over 4 feature pyramid levels
-> - Reproducible configs for **Tiny / Small / Base**
-> - Two test splits: **test** (in‑distribution) and **Generalizability** (OOD)
+This repository provides the official implementation for the paper:
+**"Regional-Scale *Acacia tortilis* Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework"** by Barakat *et al.*, 2025.
 
----
+## 🌟 Highlights
+- **Novel Architecture:** Integrates **MambaVision** backbones (from Hugging Face: `nvidia/MambaVision-*-1K`) with a U-Net–style decoder over four feature pyramid levels.
+- **Reproducible Configurations:** Provides ready-to-use configurations for **Tiny, Small, and Base** model variants.
+- **Robust Evaluation:** Includes two distinct evaluation splits: **test** (in-distribution) and **Generalizability** (out-of-distribution) to assess model performance and adaptability.
+- **Geospatial Utilities:** Features specialized inference tools to convert model predictions into GIS-compatible vector formats (GeoPackage/Shapefile) for direct use in geospatial analyses.
 
-## Table of Contents
+## 💾 Data Availability
+The UAV orthomosaic imagery used for this research is **restricted** due to sensitive land-use information and cannot be publicly shared. However, the derived vector layers used for model development and evaluation (e.g., ground truth polygons) are available upon reasonable request from the corresponding author (see `DATA_AVAILABILITY.md` for details and contact information).
+
+## 📝 Table of Contents
 - [Quick Start](#quick-start)
 - [Installation](#installation)
+- [Project Structure](#project-structure)
 - [Data Layout](#data-layout)
-- [Configs](#configs)
+- [Configuration Files](#configuration-files)
 - [Training](#training)
 - [Evaluation](#evaluation)
 - [Inference](#inference)
-- [Reproducibility & Environment](#reproducibility--environment)
-- [Troubleshooting](#troubleshooting)
+- [Reproducibility](#reproducibility)
 - [Citation](#citation)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
+- [Contact](#contact)
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
-> Quick Start uses the **copy‑in** workflow (no submodules) to keep things simple.
+This project utilizes a **copy-in** workflow, integrating custom components into an MMSegmentation environment. Follow these steps to get started rapidly:
 
-```bash
-# 1) Clone MMSeg and install editable
-git clone https://github.com/open-mmlab/mmsegmentation.git
-cd mmsegmentation
-pip install -v -e .
-cd ..
+1.  **Clone MMSegmentation and install in editable mode:**
+    ```bash
+    git clone https://github.com/open-mmlab/mmsegmentation.git
+    cd mmsegmentation
+    pip install -v -e .
+    cd ..
+    ```
 
-# 2) Clone this repo (sibling to mmsegmentation/)
-git clone https://github.com/brakuta/Acacia_U-MambaVision_Mapping.git
+2.  **Clone this repository:**
+    ```bash
+    git clone https://github.com/brakuta/Acacia_U-MambaVision_Mapping.git
+    ```
 
-# 3) Copy custom code + configs into your MMSeg clone
-cp -r Acacia_U-MambaVision_Mapping/mmseg mmsegmentation/
-cp -r Acacia_U-MambaVision_Mapping/configs mmsegmentation/
+3.  **Copy custom code and configurations:**
+    ```bash
+    cp -r Acacia_U-MambaVision_Mapping/mmseg mmsegmentation/
+    cp -r Acacia_U-MambaVision_Mapping/configs mmsegmentation/
+    ```
 
-# 4) Install dependencies (install PyTorch CUDA wheels first)
-cd mmsegmentation
-pip install torch==2.6.0+cu118 torchvision==0.21.0+cu118 torchaudio==2.6.0+cu118   --index-url https://download.pytorch.org/whl/cu118
-pip install -r ../Acacia_U-MambaVision_Mapping/requirements.txt
-```
+4.  **Install dependencies (ensure PyTorch CUDA wheels are installed first):**
+    ```bash
+    cd mmsegmentation
+    pip install torch==2.6.0+cu118 torchvision==0.21.0+cu118 torchaudio==2.6.0+cu118 \
+      --index-url https://download.pytorch.org/whl/cu118
+    pip install -r ../Acacia_U-MambaVision_Mapping/requirements.txt
+    ```
 
-> Prefer submodules? See [Installation](#installation) for the **git submodule** option.
+## 🛠️ Installation
 
----
+You can choose between two primary installation workflows:
 
-## Installation
+### Option A — Copy-in (Recommended for quick setup)
+This is the same workflow as described in [Quick Start](#quick-start). It's straightforward and suitable for most users.
 
-You can use **either** workflow:
+1.  Clone and `pip install -e` **MMSegmentation**.
+2.  Clone **this repository**.
+3.  Copy `mmseg/` and `configs/` from this repo into your `mmsegmentation/` directory.
+4.  Install dependencies (PyTorch CUDA wheels first) as shown above.
 
-### Option A — Copy‑in (same as Quick Start)
-1. Clone and `pip install -e` **mmsegmentation**
-2. Clone **this repo**
-3. Copy `mmseg/` and `configs/` into your `mmsegmentation/`
-4. Install dependencies (PyTorch CUDA wheels first)
+### Option B — Submodule (Recommended for version control and reproducibility)
+This method integrates MMSegmentation as a Git submodule, which can be beneficial for managing dependencies in larger projects or ensuring specific MMSegmentation versions.
 
-### Option B — Submodule (more reproducible)
 ```bash
 # From your new project root
 git init
 git submodule add https://github.com/open-mmlab/mmsegmentation.git mmsegmentation
 
-# Install MMSeg editable
+# Install MMSegmentation in editable mode
 cd mmsegmentation && pip install -v -e . && cd ..
-
-# Bring in this repo's custom code (or keep it in your project and point to it)
+    
+# Bring in this repo's custom code and configurations
 git clone https://github.com/brakuta/Acacia_U-MambaVision_Mapping.git tmp_repo
 cp -r tmp_repo/mmseg mmsegmentation/
 cp -r tmp_repo/configs mmsegmentation/
 rm -rf tmp_repo
 
-# Dependencies
+# Install dependencies (PyTorch CUDA wheels first)
 cd mmsegmentation
-pip install torch==2.6.0+cu118 torchvision==0.21.0+cu118 torchaudio==2.6.0+cu118   --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.6.0+cu118 torchvision==0.21.0+cu118 torchaudio==2.6.0+cu118 \
+  --index-url https://download.pytorch.org/whl/cu118
 pip install -r ../Acacia_U-MambaVision_Mapping/requirements.txt
 ```
 
