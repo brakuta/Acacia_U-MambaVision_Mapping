@@ -9,7 +9,6 @@ This repository provides the official implementation for the paper:
 ## 🌟 Highlights
 - **Architecture:** Integrates **MambaVision** backbones (from Hugging Face: `nvidia/MambaVision-*-1K`) with a U-Net–style decoder over four feature pyramid levels.
 - **Reproducible Configurations:** Provides ready-to-use configurations for **Tiny, Small, and Base** model variants.
-- **Robust Evaluation:** Includes two distinct evaluation splits: **test** (in-distribution) and **Generalizability** (out-of-distribution) to assess model performance and adaptability.
 - **Geospatial Utilities:** Features specialized inference tools to convert model predictions into GIS-compatible vector formats (GeoPackage/Shapefile) for direct use in geospatial analyses.
 
 
