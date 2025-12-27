@@ -97,7 +97,33 @@ pip install -r ../Acacia_U-MambaVision_Mapping/requirements.txt
 ```
 
 ---
+## 📂 Project Structure
 
+This project extends MMSegmentation by adding custom modules and configuration files. After the installation steps, your mmsegmentation/ directory will contain:  
+
+```
+mmsegmentation/
+├── mmseg/
+│   ├── custom_models/        # Our custom MambaVision backbone and U-Net head
+│   │   ├── mamba_vision.py
+│   │   └── generic_unet_head.py
+│   └── ... (MMSegmentation's original files)
+├── configs/
+│   ├── mambavision/          # Our specific model configurations
+│   │   ├── U-MV-tiny.py
+│   │   ├── U-MV-small.py
+│   │   └── U-MV-base.py
+│   └── ... (MMSegmentation's original configs)
+├── tools/
+│   ├── train.py
+│   ├── test.py
+│   ├── geospatial_inference.py           # Our custom single image inference script
+│   └── Batch_processing_geospatial_inference.py # Our custom batch inference script
+├── requirements.txt          # Project-specific dependencies
+└── ... (Other MMSegmentation files)
+```
+
+---
 ## Data Layout
 
 Organize your dataset as follows (indexed masks; basenames must match):  
