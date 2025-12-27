@@ -213,11 +213,11 @@ If your config defines **two** `test_dataloader` entries for `test` and `General
 ```bash
 python tools/test.py   configs/mambavision/U-MV-small.py   work_dirs/U-MV-small/latest.pth --eval mIoU mFscore
 ```
-- Replace configs/mambavision/U-MV-small.py with the path to your desired model configuration.
+- Replace **configs/mambavision/U-MV-small.py** with the path to your desired model configuration.
 
-- Replace work_dirs/U-MV-small/latest.pth with the path to your trained model checkpoint (e.g., latest.pth for the most recent or a specific epoch checkpoint).
+- Replace **work_dirs/U-MV-small/latest.pth** with the path to your trained model checkpoint (e.g., latest.pth for the most recent or a specific epoch checkpoint).
 
-- The --eval mIoU mFscore flags specify the evaluation metrics to compute (Mean IoU and Mean F-score are standard for segmentation).
+- The **--eval mIoU mFscore** flags specify the evaluation metrics to compute (Mean IoU and Mean F-score are standard for segmentation).
   
 ---
 
