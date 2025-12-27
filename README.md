@@ -221,7 +221,7 @@ python tools/test.py   configs/mambavision/U-MV-small.py   work_dirs/U-MV-small/
   
 ---
 
-## Inference
+## 🌍 Inference
 
 This project includes **two geospatial inference utilities** that post-process predictions into GIS vector formats (GeoPackage / Shapefile). They assume **georeferenced** source imagery (e.g., GeoTIFF) and require geospatial libs (see `extras/geo-requirements.txt` if provided).
 
@@ -230,17 +230,19 @@ This project includes **two geospatial inference utilities** that post-process p
 python tools/geospatial_inference.py  
 ```
 **What it does**
-1. Runs tile-wise inference over large imagery (sliding window if needed).  
-2. Reassembles a full-size raster mask in the image CRS.  
-3. Vectorizes polygons (e.g., crowns), optionally filters small objects.  
-4. Writes a **GeoPackage** (`.gpkg`) or **ESRI Shapefile** (`.shp`).
+1. Performs tile-wise inference over large input imagery using a sliding window approach to handle memory constraints.  
+2. Reassembles the tile predictions into a full-size raster mask in the original image's Coordinate Reference System (CRS).  
+3. Vectorizes the predicted polygons (e.g., individual tree crowns) from the raster mask.
+4. Optionally filters out small, spurious objects based on a minimum area threshold.
+5. Writes a **GeoPackage** (`.gpkg`) or **ESRI Shapefile** (`.shp`)format, preserving spatial information..
 
 ### B) Batch processing (folders of images)
+This script is designed for automated processing of multiple georeferenced images organized within folders.
 ```bash
 python tools/Batch_processing_geospatial_inference.py   
 ```
 **Notes**
-- The script walks subfolders and processes each georeferenced image.  
+- The script recursively walks through subfolders within the '--input-folder' and processes each georeferenced image found.  
 - Output vector files mirror the input folder structure.  
 
 
@@ -248,17 +250,17 @@ python tools/Batch_processing_geospatial_inference.py
 
 ## Citation
 
-If you use this repository, please cite:
+If you find this repository or the U-MV framework useful in your research, please cite our paper::
 
 > **Regional-Scale Acacia tortilis Crown Mapping from UAV Remote Sensing Using Semi‑Automated Annotation and a Lightweight Hybrid Segmentation Framework**  
 > Mohamed Barakat, *et al.*, 2025.
 
 ```bibtex
-@article{Barakat2025AcaciaUAVMambaVision,
-  title   = {Regional-Scale Acacia tortilis Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework},
-  author  = {Barakat, Mohamed and Others},
+@article{Barakat2025AcaciaUAVUMV,
+  title   = {Regional-Scale \textit{Acacia tortilis} Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework},
+  author  = {Gibril, M.B.A. and others},
   year    = {2025},
-  journal = {TBD}
+  journal = {In review / in press}
 }
 ```
 
@@ -270,8 +272,22 @@ Specify your license (e.g., **Apache-2.0**) in `LICENSE`.
 
 ---
 
-## Acknowledgments
+## 🙏Acknowledgments
 
+We gratefully acknowledge the foundational work of:
+
+    - MMSegmentation by OpenMMLab: The robust semantic segmentation toolbox on which this project is built.
+
+        GitHub: https://github.com/open-mmlab/mmsegmentation
+
+    - MambaVision by NVLabs: For providing the efficient MambaVision backbones that enhance our framework's performance.
+
+        GitHub: https://github.com/NVlabs/MambaVision
+
+    - Hugging Face Transformers: For hosting and facilitating the loading of MambaVision model weights.
+
+        Hugging Face: https://huggingface.co/nvidia
+        
 - Built on **MMSegmentation** by OpenMMLab: <https://github.com/open-mmlab/mmsegmentation>  
 - Uses **MambaVision** backbones by NVLabs: <https://github.com/NVlabs/MambaVision>  
 - Model weights are loaded via **Hugging Face Transformers**: <https://huggingface.co/nvidia>
