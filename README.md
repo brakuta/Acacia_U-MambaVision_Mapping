@@ -124,22 +124,22 @@ mmsegmentation/
 ```
 
 ---
-## Data Layout
+## 🌳 Data Layout
 
-Organize your dataset as follows (indexed masks; basenames must match):  
+Organize your dataset with separate directories for images (img_dir) and corresponding indexed segmentation masks (ann_dir). Basenames of image and annotation files within corresponding subdirectories (e.g., train, val, test, Generalizability) must match.:  
 
 ```
-uav_acacia/
+UAV_Acacia_Data/
 ├── img_dir/
-│   ├── train/
-│   ├── val/
-│   ├── test/                 # in-distribution test
-│   └── Generalizability/     # OOD test
+│   ├── train/                 # Training images
+│   ├── val/                   # Validation images
+│   ├── test/                  # In-distribution test images
+│   └── Generalizability/      # Out-of-distribution (OOD) test images
 └── ann_dir/
-    ├── train/
-    ├── val/
-    ├── test/
-    └── Generalizability/
+    ├── train/                 # Training masks
+    ├── val/                   # Validation masks
+    ├── test/                  # In-distribution test masks
+    └── Generalizability/      # Out-of-distribution (OOD) test masks
 ```
 
 - **Images**: `.tif` or common image formats readable by MMSeg.  
@@ -155,9 +155,10 @@ palette = [[0, 0, 0], [0, 255, 0]]
 
 ---
 
-## Configs
+## ⚙️ Configuration Files
 
-After copying, configs live under:
+Our custom model configurations are located under mmsegmentation/configs/mambavision/:
+
 ```
 mmsegmentation/configs/mambavision/
   U-MV-tiny.py
@@ -169,7 +170,8 @@ Each config:
 - Imports the **U‑Net head** from `mmseg/custom_models/generic_unet_head.py`
 - Uses the **custom dataset base** (not ADE20K) and defines your `classes/palette`
 
-> If your files live under `mmseg/custom_models/`, include in the config:
+> If your custom files are placed in mmseg/custom_models/, you must include the following custom_imports section in your configuration file to ensure they are correctly loaded by MMSegmentation:
+> 
 > ```python
 > custom_imports = dict(
 >     imports=[
