@@ -184,34 +184,40 @@ Each config:
 
 ---
 
-## Training
+## 🏋️ Training
 
-From inside **mmsegmentation/**:
+To train a model, navigate to the mmsegmentation/ directory and run the tools/train.py script with your desired configuration file::
 ```bash
-# Tiny
+# From inside the mmsegmentation/ directory
+
+# Train the Tiny model
 python tools/train.py configs/mambavision/U-MV-tiny.py
 
-# Small
+# Train the Small model
 python tools/train.py configs/mambavision/U-MV-small.py
 
-# Base
+# Train the Base model
 python tools/train.py configs/mambavision/U-MV-base.py
 ```
 
-Tips:
+Training Tips:
 - Set `work_dir` in each config to control where checkpoints/logs are saved.
 - For determinism: `env_cfg = dict(cudnn_benchmark=False)` and fix seeds as needed.
 
 ---
 
-## Evaluation
+## 📊 Evaluation
 
 If your config defines **two** `test_dataloader` entries for `test` and `Generalizability`, a single command evaluates both:
 
 ```bash
 python tools/test.py   configs/mambavision/U-MV-small.py   work_dirs/U-MV-small/latest.pth --eval mIoU mFscore
 ```
+    Replace configs/mambavision/U-MV-small.py with the path to your desired model configuration.
 
+    Replace work_dirs/U-MV-small/latest.pth with the path to your trained model checkpoint (e.g., latest.pth for the most recent or a specific epoch checkpoint).
+
+    The --eval mIoU mFscore flags specify the evaluation metrics to compute (Mean IoU and Mean F-score are standard for segmentation).
 ---
 
 ## Inference
