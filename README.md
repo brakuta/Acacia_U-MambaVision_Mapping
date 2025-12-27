@@ -7,13 +7,11 @@ This repository provides the official implementation for the paper:
 **"Regional-Scale *Acacia tortilis* Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework"** by Barakat *et al.*, 2025.
 
 ## 🌟 Highlights
-- **Novel Architecture:** Integrates **MambaVision** backbones (from Hugging Face: `nvidia/MambaVision-*-1K`) with a U-Net–style decoder over four feature pyramid levels.
+- **Architecture:** Integrates **MambaVision** backbones (from Hugging Face: `nvidia/MambaVision-*-1K`) with a U-Net–style decoder over four feature pyramid levels.
 - **Reproducible Configurations:** Provides ready-to-use configurations for **Tiny, Small, and Base** model variants.
 - **Robust Evaluation:** Includes two distinct evaluation splits: **test** (in-distribution) and **Generalizability** (out-of-distribution) to assess model performance and adaptability.
 - **Geospatial Utilities:** Features specialized inference tools to convert model predictions into GIS-compatible vector formats (GeoPackage/Shapefile) for direct use in geospatial analyses.
 
-## 💾 Data Availability
-The UAV orthomosaic imagery used for this research is **restricted** due to sensitive land-use information and cannot be publicly shared. However, the derived vector layers used for model development and evaluation (e.g., ground truth polygons) are available upon reasonable request from the corresponding author (see `DATA_AVAILABILITY.md` for details and contact information).
 
 ## 📝 Table of Contents
 - [Quick Start](#quick-start)
