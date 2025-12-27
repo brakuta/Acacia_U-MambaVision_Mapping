@@ -274,14 +274,15 @@ Specify your license (e.g., **Apache-2.0**) in `LICENSE`.
 
 ## 🙏Acknowledgments
 
+
 We gratefully acknowledge the foundational work of:
 
-    - **MMSegmentation** by OpenMMLab: The robust semantic segmentation toolbox on which this project is built: <https://github.com/open-mmlab/mmsegmentation>  .
+- **MMSegmentation (OpenMMLab):** the semantic segmentation toolbox on which this project is built.  
+  https://github.com/open-mmlab/mmsegmentation
 
+- **MambaVision (NVLabs):** for providing the MambaVision backbones used in our framework.  
+  https://github.com/NVlabs/MambaVision
 
-    - **MambaVision** by NVLabs: For providing the efficient MambaVision backbones that enhance our framework's performance: <https://github.com/NVlabs/MambaVision>
+- **Hugging Face:** for hosting and enabling access to the pretrained MambaVision model weights.  
+  https://huggingface.co/nvidia
 
-        GitHub: https://github.com/NVlabs/MambaVision
-
-    - **Hugging Face Transformers**: For hosting and facilitating the loading of MambaVision model weights. Hugging Face: <https://huggingface.co/nvidia>
-        
