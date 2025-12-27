@@ -1,4 +1,4 @@
-readme_content = """
+
 # Regional-Scale *Acacia tortilis* Crown Mapping from UAV Imagery (U-MV)
 
 **U-MV (U-Shape-MambaVision)** — A lightweight U-shaped semantic segmentation framework (U-Net–style decoder + **MambaVision** backbone) for delineating *Acacia tortilis* crowns in ultra-high-resolution UAV imagery. Built on **MMSegmentation**.
