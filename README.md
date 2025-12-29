@@ -124,6 +124,13 @@ mmsegmentation/
 ```
 
 ---
+## 🧠 Model Architecture
+
+The U-MV framework combines a MambaVision backbone for robust feature extraction with a U-Net style decoder for precise semantic segmentation. The overall architecture is illustrated below:
+
+![Model Architecture](docs/Assets/mamba_vision_architecture.png)
+
+---
 ## 🌳 Data Layout
 
 Organize your dataset with separate directories for images (img_dir) and corresponding indexed segmentation masks (ann_dir). Basenames of image and annotation files within corresponding subdirectories (e.g., train, val, test, Generalizability) must match.:  
@@ -154,7 +161,6 @@ palette = [[0, 0, 0], [0, 255, 0]]
 ```
 
 ---
-
 ## ⚙️ Configuration Files
 
 Our custom model configurations are located under mmsegmentation/configs/mambavision/:
