@@ -128,7 +128,8 @@ mmsegmentation/
 
 The U-MV framework combines a MambaVision backbone for robust feature extraction with a U-Net style decoder for precise semantic segmentation. The overall architecture is illustrated below:
 
-![Model Architecture](docs/Assets/mamba_vision_architecture.png)
+![Model Architecture](Assets/mamba_vision_architecture.png)
+
 
 ---
 ## 🌳 Data Layout
