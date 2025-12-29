@@ -137,7 +137,7 @@ The U-MV framework combines a MambaVision backbone for robust feature extraction
 ---
 ## ⬇️ Pre-trained Weights
 
-The following pretrained weights are provided:
+We provide pre-trained weights for the Tiny, Small, and Base variants of the U-MV model. These weights correspond to the models used in our publication and can be downloaded:
 
 | Model | File | Download |
 |------|------|----------|
