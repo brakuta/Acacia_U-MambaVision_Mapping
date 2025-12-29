@@ -13,19 +13,19 @@ This repository provides the official implementation for the paper:
 
 
 ## 📝 Table of Contents
-- [Quick Start](#quick-start)
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Data Layout](#data-layout)
-- [Configuration Files](#configuration-files)
-- [Training](#training)
-- [Evaluation](#evaluation)
-- [Inference](#inference)
-- [Reproducibility](#reproducibility)
+- [Quick Start](#-quick-start)
+- [Installation](#-installation)
+- [Project Structure](#-project-structure)
+- [Model Architecture](#-model-architecture)
+- [Pre-trained Weights](#-pre-trained-weights)
+- [Data Layout](#-data-layout)
+- [Configuration Files](#-configuration-files)
+- [Training](#-training)
+- [Evaluation](#-evaluation)
+- [Inference](#-inference)
 - [Citation](#citation)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
-- [Contact](#contact)
 
 ---
 
