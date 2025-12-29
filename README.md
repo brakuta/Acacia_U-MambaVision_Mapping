@@ -132,6 +132,22 @@ The U-MV framework combines a MambaVision backbone for robust feature extraction
 
 
 ---
+
+
+---
+## ⬇️ Pre-trained Weights
+
+The following pretrained weights are provided:
+
+| Model | File | Download |
+|------|------|----------|
+| U-MV Tiny | `U-MV-tiny_latest.pth` | [Download](Pretrained_Weights/U-MV-tiny_latest.pth) |
+| U-MV Small | `U-MV-small_latest.pth` | [Download](Pretrained_Weights/U-MV-small_latest.pth) |
+| U-MV Base | `U-MV-base_latest.pth` | [Download](Pretrained_Weights/U-MV-base_latest.pth) |
+---
+
+
+
 ## 🌳 Data Layout
 
 Organize your dataset with separate directories for images (img_dir) and corresponding indexed segmentation masks (ann_dir). Basenames of image and annotation files within corresponding subdirectories (e.g., train, val, test, Generalizability) must match.:  
