@@ -4,7 +4,7 @@
 **U-MV (U-Shape-MambaVision)** — A lightweight U-shaped semantic segmentation framework (U-Net–style decoder + **MambaVision** backbone) for delineating *Acacia tortilis* crowns in ultra-high-resolution UAV imagery. Built on **MMSegmentation**.
 
 This repository provides the official implementation for the paper:
-**"Regional-Scale *Acacia tortilis* Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework"** by Barakat *et al.*, 2025.
+**"Regional-Scale *Acacia tortilis* Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework"** by M.B.A Gibril et al., 2026.
 
 ## 🌟 Highlights
 - **Architecture:** Integrates **MambaVision** backbones (from Hugging Face: `nvidia/MambaVision-*-1K`) with a U-Net–style decoder over four feature pyramid levels.
@@ -253,14 +253,17 @@ python tools/Batch_processing_geospatial_inference.py
 If you find this repository or the U-MV framework useful in your research, please cite our paper::
 
 > **Regional-Scale Acacia tortilis Crown Mapping from UAV Remote Sensing Using Semi‑Automated Annotation and a Lightweight Hybrid Segmentation Framework**  
-> Mohamed Barakat, *et al.*, 2025.
+>  Gibril M.B.A. *et al.*, 2026.
 
 ```bibtex
 @article{Barakat2025AcaciaUAVUMV,
-  title   = {Regional-Scale \textit{Acacia tortilis} Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework},
+  title   = {Regional-scale Acacia tortilis crown mapping from UAV remote sensing
+using semi-automated annotation and a lightweight hybrid segmentation
+framework},
   author  = {Gibril, M.B.A. and others},
-  year    = {2025},
-  journal = {In review / in press}
+  year    = {2026},
+  journal = {International Journal of Applied Earth Observations and
+Geoinformation}
 }
 ```
 
