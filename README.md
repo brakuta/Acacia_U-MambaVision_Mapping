@@ -265,14 +265,12 @@ If you find this repository or the U-MV framework useful in your research, pleas
 >  Gibril M.B.A. *et al.*, 2026.
 
 ```bibtex
-@article{Barakat2025AcaciaUAVUMV,
-  title   = {Regional-scale Acacia tortilis crown mapping from UAV remote sensing
-using semi-automated annotation and a lightweight hybrid segmentation
-framework},
-  author  = {Gibril, M.B.A. and others},
-  year    = {2026},
-  journal = {International Journal of Applied Earth Observations and
-Geoinformation}
+@article{Gibril2026UMVAcacia,
+  title = {Regional-scale Acacia tortilis crown mapping from UAV remote sensing using semi-automated annotation and a lightweight hybrid segmentation framework},
+  author = {Gibril, Mohamed Barakat A. and others},
+  journal = {International Journal of Applied Earth Observation and Geoinformation},
+  year = {2026},
+  doi = {https://doi.org/10.1016/j.jag.2026.105214}
 }
 ```
 
