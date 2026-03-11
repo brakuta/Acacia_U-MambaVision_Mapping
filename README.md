@@ -122,7 +122,16 @@ mmsegmentation/
 ├── requirements.txt          # Project-specific dependencies
 └── ... (Other MMSegmentation files)
 ```
+---
+## 📦 Pretrained Weights
 
+The pretrained U-MV models used in this study are provided below. These weights correspond to the Tiny, Small, and Base variants of the proposed architecture.
+
+| Model Variant | File | Description | Download |
+|---------------|------|-------------|----------|
+| U-MV-Tiny | `U-MV-tiny_latest.pth` | Lightweight version for efficient inference and lower GPU memory usage | [Download](./Pretrained_Weights/U-MV-tiny_latest.pth) |
+| U-MV-Small | `U-MV-small_latest.pth` | Balanced model providing improved accuracy with moderate computational cost | [Download](./Pretrained_Weights/U-MV-small_latest.pth) |
+| U-MV-Base | `U-MV-base_latest.pth` | Highest-capacity model with improved feature representation and segmentation accuracy | [Download](./Pretrained_Weights/U-MV-base_latest.pth) |
 ---
 ## 🌳 Data Layout
 
