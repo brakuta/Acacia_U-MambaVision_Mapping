@@ -6,6 +6,15 @@
 This repository provides the official implementation for the paper:
 **"Regional-Scale *Acacia tortilis* Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework"** by M.B.A Gibril et al., 2026.
 
+
+## 🧠 U-MV Architecture
+
+<p align="center">
+  <img src="Assets/mamba_vision_architecture.png" alt="U-MV architecture" width="900">
+</p>
+
+**Figure 1.** Overview of the proposed **U-MV (U-Shape-MambaVision)** framework, which combines a MambaVision backbone with a lightweight U-shaped decoder for *Acacia tortilis* crown segmentation from ultra-high-resolution UAV imagery.
+
 ## 🌟 Highlights
 - **Architecture:** Integrates **MambaVision** backbones (from Hugging Face: `nvidia/MambaVision-*-1K`) with a U-Net–style decoder over four feature pyramid levels.
 - **Reproducible Configurations:** Provides ready-to-use configurations for **Tiny, Small, and Base** model variants.
