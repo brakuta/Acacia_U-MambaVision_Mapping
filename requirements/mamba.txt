@@ -1,0 +1,7 @@
+# Compiled CUDA kernels required by MambaVision (selective scan).  Build against
+# the installed torch: pip install --no-build-isolation -r requirements/mamba.txt
+# Prebuilt wheels are fetched from GitHub releases when they match your
+# torch/CUDA/Python combination; otherwise a source build (10-30 min) is performed.
+mamba-ssm==2.2.4
+# Optional: only needed by models that call causal_conv1d (MambaVision does not).
+# causal-conv1d>=1.4.0

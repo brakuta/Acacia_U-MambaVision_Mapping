@@ -1,0 +1,41 @@
+# docker compose -f docker/docker-compose.yml build
+# docker compose -f docker/docker-compose.yml run --rm umv            # interactive shell
+# docker compose -f docker/docker-compose.yml run --rm umv python tools/verify_install.py --variant small
+#
+# Set DATA_DIR to the host folder holding the dataset / orthomosaics.  On WSL2 a
+# Windows drive is reachable as /mnt/<letter>, e.g. DATA_DIR=/mnt/h/UAV_Data.
+services:
+  umv:
+    image: umv:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    working_dir: /workspace/U-MV
+    stdin_open: true
+    tty: true
+    ipc: host                # shared memory for DataLoader workers
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    environment:
+      - HF_HOME=/workspace/hf_cache
+      - HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-0}
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+      - GDAL_CACHEMAX=2048
+    volumes:
+      - ..:/workspace/U-MV                     # live source tree (edits visible immediately)
+      - ${DATA_DIR:-./data}:/data              # dataset and orthomosaics
+      - hf_cache:/workspace/hf_cache           # MambaVision code + ImageNet weights
+      - ${WORK_DIRS:-../work_dirs}:/workspace/U-MV/work_dirs
+      - ${SCRATCH_DIR:-umv_scratch}:/tmp/geospatial_work
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  hf_cache:
+  umv_scratch:

@@ -1,0 +1,10 @@
+# Geospatial inference (tools/geospatial_inference.py, tools/batch_geospatial_inference.py).
+# GDAL Python bindings (osgeo) are NOT pip-installable in general; install GDAL through
+# conda-forge (see docker/Dockerfile) or your OS package manager.  Without osgeo the
+# vectoriser falls back to an in-memory rasterio implementation that only suits
+# rasters up to ~1.5 gigapixels.
+rasterio>=1.3.9
+geopandas>=0.14
+shapely>=2.0
+pyproj>=3.6
+pyogrio>=0.7

@@ -1,0 +1,24 @@
+# Core stack for U-MV (install AFTER torch/torchvision and mmcv, see docs/01_installation.md).
+# Versions are those of the environment in which the published experiments were run
+# (docs/reference/environment.frozen.yml); mmengine/mmcv/mmseg pins are mutually compatible.
+mmengine==0.10.7
+mmsegmentation==1.2.2
+# Hugging Face / MambaVision remote code dependencies
+transformers==4.50.0
+huggingface-hub==0.30.2
+tokenizers==0.21.1
+safetensors>=0.5.0
+timm==1.0.15
+einops==0.8.1
+# general
+numpy>=1.26,<2.3
+opencv-python==4.11.0.86
+pillow>=10
+scipy>=1.11
+matplotlib>=3.7
+prettytable>=3.5
+tqdm>=4.65
+ftfy
+regex
+packaging
+ninja

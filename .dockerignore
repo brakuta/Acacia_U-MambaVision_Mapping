@@ -1,0 +1,8 @@
+.git
+.idea
+work_dirs
+data
+**/__pycache__
+*.pth
+Assets/*.png
+docs/reference/environment.frozen.yml
