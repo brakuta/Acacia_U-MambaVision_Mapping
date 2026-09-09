@@ -18,6 +18,9 @@ python tools/test.py configs/mambavision/U-MV-small.py work_dirs/U-MV-small/best
 python tools/test.py configs/mambavision/U-MV-small.py work_dirs/U-MV-small/best_mIoU_iter_95000.pth \
     --test-split Generalizability
 
+# original work directories: the folder resolves to its best_mIoU_iter_*.pth
+python tools/test.py configs/mambavision/U-MV-small.py "/weights/mambavision-s_generic-unet_acacia-88" --test-split test2
+
 # released checkpoints (after git lfs pull)
 python tools/test.py configs/mambavision/U-MV-tiny.py  Pretrained_Weights/U-MV-tiny_latest.pth
 python tools/test.py configs/mambavision/U-MV-small.py Pretrained_Weights/U-MV-small_latest.pth

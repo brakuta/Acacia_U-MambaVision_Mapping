@@ -8,7 +8,8 @@ from .pipeline import InferenceSettings
 
 def add_common_arguments(p: argparse.ArgumentParser) -> argparse.ArgumentParser:
     p.add_argument('--config', required=True, help='U-MV config, e.g. configs/mambavision/U-MV-small.py')
-    p.add_argument('--checkpoint', required=True, help='U-MV checkpoint (.pth)')
+    p.add_argument('--checkpoint', required=True,
+                   help='U-MV checkpoint (.pth) or a work directory containing best_mIoU_iter_*.pth')
     p.add_argument('--device', default='cuda:0')
     p.add_argument('--scratch-dir', default=None,
                    help='Fast local directory used to stage the input and accumulators '

@@ -24,8 +24,39 @@ def is_lfs_pointer(path: str) -> bool:
         return False
 
 
+def resolve_checkpoint(path: str, prefer: str = 'best') -> str:
+    """Resolve a checkpoint path, accepting an MMSegmentation work directory.
+
+    If ``path`` is a directory, ``best_mIoU_iter_*.pth`` is selected (the
+    highest iteration if several exist).  With ``prefer='last'`` the file
+    named in ``last_checkpoint`` (or the highest ``iter_*.pth``) is returned
+    instead.  Regular files are returned unchanged.
+    """
+    import glob
+    import os
+    import re
+
+    if not os.path.isdir(path):
+        return path
+    if prefer == 'best':
+        cands = glob.glob(os.path.join(path, 'best_mIoU_iter_*.pth'))
+        if cands:
+            return max(cands, key=lambda p: int(re.findall(r'(\d+)\.pth$', p)[0]))
+    last = os.path.join(path, 'last_checkpoint')
+    if os.path.isfile(last):
+        name = open(last).read().strip()
+        cand = name if os.path.isabs(name) and os.path.isfile(name) else os.path.join(path, os.path.basename(name))
+        if os.path.isfile(cand):
+            return cand
+    cands = glob.glob(os.path.join(path, 'iter_*.pth'))
+    if cands:
+        return max(cands, key=lambda p: int(re.findall(r'(\d+)\.pth$', p)[0]))
+    raise FileNotFoundError(f'No best_mIoU_iter_*.pth, last_checkpoint or iter_*.pth found in {path}')
+
+
 def load_checkpoint_file(path: str) -> Tuple[Dict[str, torch.Tensor], Dict[str, Any]]:
     """Return ``(state_dict, meta)`` from an MMEngine/PyTorch checkpoint."""
+    path = resolve_checkpoint(path)
     if is_lfs_pointer(path):
         raise RuntimeError(
             f'{path} is a Git LFS pointer, not a checkpoint. Run `git lfs install && '

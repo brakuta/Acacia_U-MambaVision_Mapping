@@ -46,11 +46,11 @@ Paths below assume Windows 11 with WSL2 and Docker Desktop; a Windows folder
 | 5 | Start a shell | `docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm umv` | Prompt in `/workspace/U-MV`; `/data` and `/weights` mounted |
 | 6 | Verify the software stack | `python tools/verify_install.py --variant small` | `RESULT: OK`; forward pass `(1, 2, 512, 512)` |
 | 7 | Validate the dataset | `python tools/check_dataset.py /data --splits train val test2 Generalizability` | `RESULT: OK`; pairs 26 615 / 2 400 / 3 125 / 2 165 |
-| 8 | Identify a checkpoint | `python tools/inspect_checkpoint.py "/weights/mambavision-s_generic-unet_acacia-88/best_mIoU_iter_95000.pth"` | `variant: small`, `iteration: 95000` |
+| 8 | Identify a checkpoint | `python tools/inspect_checkpoint.py "/weights/mambavision-s_generic-unet_acacia-88"` | prints the resolved `best_mIoU_iter_*.pth`, `variant: small`, its iteration |
 | 9 | Unit tests | `python -m pytest tests -q` | all passed |
-| 10 | Reproduce the published test metrics | `python tools/test.py configs/mambavision/U-MV-small.py "/weights/mambavision-s_generic-unet_acacia-88/best_mIoU_iter_95000.pth" --test-split test2` | mIoU ≈ 85.38 %, mF-score ≈ 91.58 % (Table 1) |
+| 10 | Reproduce the published test metrics | `python tools/test.py configs/mambavision/U-MV-small.py "/weights/mambavision-s_generic-unet_acacia-88" --test-split test2` | mIoU ≈ 85.38 %, mF-score ≈ 91.58 % (Table 1) |
 | 11 | Generalisability split | same command with `--test-split Generalizability` | mIoU ≈ 89.48 %, mF-score ≈ 94.17 % |
-| 12 | Map one orthomosaic | `python tools/geospatial_inference.py --config configs/mambavision/U-MV-small.py --checkpoint "/weights/.../best_mIoU_iter_95000.pth" --input /data/<ortho>.tif --output /data/predictions/<ortho>_crowns.gpkg --scratch-dir /tmp/geospatial_work --min-area 1.0 --save-prob` | `.gpkg` with `area`, `mean_prob`, opens in QGIS/ArcGIS Pro in the orthomosaic CRS |
+| 12 | Map one orthomosaic | `python tools/geospatial_inference.py --config configs/mambavision/U-MV-small.py --checkpoint "/weights/mambavision-s_generic-unet_acacia-88" --input /data/<ortho>.tif --output /data/predictions/<ortho>_crowns.gpkg --scratch-dir /tmp/geospatial_work --min-area 1.0 --save-prob` | `.gpkg` with `area`, `mean_prob`, opens in QGIS/ArcGIS Pro in the orthomosaic CRS |
 | 13 | Batch mapping | `python tools/batch_geospatial_inference.py ... --skip-existing` (`docs/05_inference.md`) | mirrored folder of `.gpkg` + `batch_summary.json` |
 | 14 | (Optional) retrain or resume | `python tools/train.py configs/mambavision/U-MV-small.py` or `python tools/train.py "/weights/mambavision-s_generic-unet_acacia-88/mambavision-s_generic-unet_acacia.py" --work-dir work_dirs/resume_s --resume` | `work_dirs/.../best_mIoU_iter_*.pth` |
 
@@ -59,10 +59,19 @@ Steps 6–13 can also be run without Docker after the manual installation in
 
 ## Which checkpoint to use
 
-`best_mIoU_iter_*.pth` is the checkpoint selected on validation mIoU and used
-for the paper's test results; `iter_100000.pth` is the final iteration. Use
-the former unless a study specifically requires the last iteration. The
-`-88` suffix of the small model's folder denotes its validation mIoU (88.02 %).
+Use `best_mIoU_iter_*.pth`: the checkpoint selected on validation mIoU and
+used for the paper's test results. Every tool accepts the work-directory
+folder in place of a file and resolves this checkpoint automatically (the
+highest iteration if several exist), so the iteration number of each variant
+need not be known:
+
+```bash
+--checkpoint "/weights/mambavision-t_generic-unet_acacia"      # tiny
+--checkpoint "/weights/mambavision-s_generic-unet_acacia-88"   # small (-88 = validation mIoU 88.02 %)
+--checkpoint "/weights/mambavision-b_generic-unet_acacia"      # base
+```
+
+`iter_100000.pth` (final iteration) is retained for completeness only.
 
 ## Where results go
 

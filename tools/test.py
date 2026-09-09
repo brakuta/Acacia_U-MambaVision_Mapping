@@ -11,6 +11,7 @@ import _bootstrap  # noqa: F401
 from mmengine.config import DictAction
 from mmengine.runner import Runner
 
+from umv.checkpoint import resolve_checkpoint
 from umv.compat import load_config
 
 
@@ -19,7 +20,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='MMSeg test (and eval) a model')
     parser.add_argument('config', help='train config file path')
-    parser.add_argument('checkpoint', help='checkpoint file')
+    parser.add_argument('checkpoint', help='checkpoint file, or a work directory containing best_mIoU_iter_*.pth')
     parser.add_argument(
         '--work-dir',
         help=('if specified, the evaluation metric results will be dumped'
@@ -109,7 +110,8 @@ def main():
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
 
-    cfg.load_from = args.checkpoint
+    cfg.load_from = resolve_checkpoint(args.checkpoint)  # a work dir resolves to best_mIoU_iter_*.pth
+    print(f'-> checkpoint: {cfg.load_from}')
 
     if args.test_split:
         cfg.test_dataloader.dataset.data_prefix = dict(

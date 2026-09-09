@@ -7,16 +7,17 @@ import argparse
 import json
 
 import _bootstrap  # noqa: F401
-from umv.checkpoint import load_checkpoint_file, summarize
+from umv.checkpoint import load_checkpoint_file, resolve_checkpoint, summarize
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('checkpoint')
+    p.add_argument('checkpoint', help='.pth file or a work directory (resolves best_mIoU_iter_*.pth)')
     p.add_argument('--keys', action='store_true', help='list all parameter names and shapes')
     p.add_argument('--config-text', action='store_true', help='print the training config stored in meta')
     a = p.parse_args()
 
+    a.checkpoint = resolve_checkpoint(a.checkpoint)
     info = summarize(a.checkpoint)
     print(json.dumps(info, indent=2, default=str))
     if info['variant'] is None:

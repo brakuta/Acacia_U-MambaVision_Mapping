@@ -25,3 +25,14 @@ python tools/inspect_checkpoint.py /path/to/checkpoint.pth
 A checkpoint obtained elsewhere (e.g. a `best_mIoU_iter_*.pth` from a
 `work_dirs/` folder) can be used directly by passing its path to
 `tools/test.py` or the inference scripts; no renaming is required.
+
+## Original work directories
+
+If the MMSegmentation work directories of the published runs are available
+(`mambavision-{t,s,b}_generic-unet_acacia*`), prefer their `best_mIoU_iter_*.pth`
+files. Passing the folder itself to any tool selects that file:
+
+```bash
+python tools/inspect_checkpoint.py "/weights/mambavision-s_generic-unet_acacia-88"
+python tools/test.py configs/mambavision/U-MV-small.py "/weights/mambavision-s_generic-unet_acacia-88" --test-split test2
+```

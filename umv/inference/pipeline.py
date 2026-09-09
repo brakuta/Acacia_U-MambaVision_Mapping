@@ -68,8 +68,11 @@ def load_segmentor(config: str, checkpoint: str, device: str = 'cuda:0',
     """
     from mmseg.apis import init_model
 
+    from ..checkpoint import resolve_checkpoint
     from ..compat import load_config
 
+    checkpoint = resolve_checkpoint(checkpoint)  # a work directory resolves to best_mIoU_iter_*.pth
+    print(f'-> checkpoint: {checkpoint}')
     cfg = load_config(config)  # registers umv; accepts legacy work-dir configs
     bb = cfg.model.get('backbone', {})
     if isinstance(bb, dict) and 'pretrained' in bb or str(bb.get('type', '')).startswith(

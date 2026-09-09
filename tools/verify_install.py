@@ -66,6 +66,7 @@ def main():
         device = a.device or ('cuda:0' if cuda else 'cpu')
         from mmseg.registry import MODELS
         from mmseg.utils import register_all_modules
+        from umv.checkpoint import resolve_checkpoint
         from umv.compat import load_config
         register_all_modules(init_default_scope=True)
         cfg = load_config(a.config or f'configs/mambavision/U-MV-{a.variant}.py')
@@ -75,7 +76,7 @@ def main():
         model = MODELS.build(cfg.model).to(device).eval()
         if a.checkpoint:
             from mmengine.runner import load_checkpoint
-            load_checkpoint(model, a.checkpoint, map_location='cpu')
+            load_checkpoint(model, resolve_checkpoint(a.checkpoint), map_location='cpu')
         n = sum(p.numel() for p in model.parameters()) / 1e6
         print(f'U-MV-{a.variant}: {n:.2f} M parameters, built in {time.time() - t0:.1f} s on {device}')
         x = torch.randn(1, 3, a.size, a.size, device=device)
