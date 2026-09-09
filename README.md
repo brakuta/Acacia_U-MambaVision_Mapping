@@ -132,9 +132,9 @@ Parameters, channel-order caveat and output attributes:
 
 | Variant | Encoder | File (Git LFS) | Size |
 |---|---|---|---|
-| U-MV-tiny | MambaVision-T-1K (80/160/320/640) | `Pretrained_Weights/U-MV-tiny_latest.pth` | 159 MB |
-| U-MV-small | MambaVision-S-1K (96/192/384/768) | `Pretrained_Weights/U-MV-small_latest.pth` | 234 MB |
-| U-MV-base | MambaVision-B-1K (128/256/512/1024) | `Pretrained_Weights/U-MV-base_latest.pth` | 422 MB |
+| U-MV-tiny | MambaVision-T-1K (80/160/320/640) | `Pretrained_Weights/U-MV-tiny_latest.pth` (best mIoU, iter 100k) | 159 MB |
+| U-MV-small | MambaVision-S-1K (96/192/384/768) | `Pretrained_Weights/U-MV-small_latest.pth` (best mIoU, iter 95k) | 234 MB |
+| U-MV-base | MambaVision-B-1K (128/256/512/1024) | `Pretrained_Weights/U-MV-base_latest.pth` (best mIoU, iter 60k) | 422 MB |
 
 `python tools/inspect_checkpoint.py <file>.pth` identifies the variant of any
 local checkpoint. Checkpoints and training configs from the original

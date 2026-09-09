@@ -61,7 +61,12 @@ the location of the hand-over folder.
   CPU (MMEngine 0.10.7, MMSegmentation 1.2.2).
 * The inference pipeline recovers synthetic crowns with correct CRS, areas
   (±5 %), attributes and seam-free tiling for both blending modes.
-* The Git LFS objects of the three released checkpoints are present on GitHub.
+* The Git LFS objects of the three released checkpoints are present on GitHub
+  and their SHA-256 values equal those of `best_mIoU_iter_{100000,95000,60000}.pth`
+  in the tiny/small/base work directories.
+* The original container definition was recovered and archived as
+  `docs/reference/Dockerfile.original`; it uses the same base image and MMCV
+  build route as `docker/Dockerfile`.
 
 ## Not validated here (requires a GPU host)
 
@@ -78,5 +83,7 @@ the location of the hand-over folder.
 2. Whether to publish the checkpoints on Zenodo/Hugging Face in addition to
    Git LFS (bandwidth quota of GitHub LFS is 1 GB month⁻¹ on free plans; three
    full downloads exhaust it).
+4. Location of the complete training set (26 615 tiles); the archived folder
+   contains 4 893.
 3. Whether regional maps produced with the earlier BGR-swapped scripts should
    be regenerated.

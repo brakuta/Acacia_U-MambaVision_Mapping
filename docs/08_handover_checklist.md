@@ -25,6 +25,11 @@ Practical notes on the folder:
   share; training reads ~30 000 tiles per epoch. Excluding ArcGIS side-cars
   (`*.tif.aux.xml`, `*.tif.ovr`) during the copy saves space; the code ignores
   them either way.
+* The archived `train` split contains 4 893 tiles; the published models were
+  trained on 26 615, and the folder was pruned after training (no fuller copy
+  exists). Evaluation and inference are complete with this folder; retraining
+  reproduces the recipe, not the published model (`docs/07_reproducibility.md`,
+  §7.2, item 7).
 * The in-distribution test split is named `test2`. Nothing needs renaming;
   evaluation commands pass `--test-split test2`.
 * The archived `.py` configs reference the previous code layout. They load
@@ -45,7 +50,7 @@ Paths below assume Windows 11 with WSL2 and Docker Desktop; a Windows folder
 | 4 | Build the image (30–60 min) | `docker compose --env-file docker/.env -f docker/docker-compose.yml build` | `umv:latest` in `docker images` |
 | 5 | Start a shell | `docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm umv` | Prompt in `/workspace/U-MV`; `/data` and `/weights` mounted |
 | 6 | Verify the software stack | `python tools/verify_install.py --variant small` | `RESULT: OK`; forward pass `(1, 2, 512, 512)` |
-| 7 | Validate the dataset | `python tools/check_dataset.py /data --splits train val test2 Generalizability` | `RESULT: OK`; pairs 26 615 / 2 400 / 3 125 / 2 165 |
+| 7 | Validate the dataset | `python tools/check_dataset.py /data --splits train val test2 Generalizability` | `RESULT: OK`; pairs 4 893 / 2 407 / 3 123 / 2 162 in the archived folder (see note below) |
 | 8 | Identify a checkpoint | `python tools/inspect_checkpoint.py "/weights/mambavision-s_generic-unet_acacia-88"` | prints the resolved `best_mIoU_iter_*.pth`, `variant: small`, its iteration |
 | 9 | Unit tests | `python -m pytest tests -q` | all passed |
 | 10 | Reproduce the published test metrics | `python tools/test.py configs/mambavision/U-MV-small.py "/weights/mambavision-s_generic-unet_acacia-88" --test-split test2` | mIoU ≈ 85.38 %, mF-score ≈ 91.58 % (Table 1) |
@@ -60,7 +65,9 @@ Steps 6–13 can also be run without Docker after the manual installation in
 ## Which checkpoint to use
 
 Use `best_mIoU_iter_*.pth`: the checkpoint selected on validation mIoU and
-used for the paper's test results. Every tool accepts the work-directory
+used for the paper's test results. The files released on GitHub
+(`Pretrained_Weights/U-MV-*_latest.pth`) are byte-identical to these
+(tiny: iteration 100 000; small: 95 000; base: 60 000). Every tool accepts the work-directory
 folder in place of a file and resolves this checkpoint automatically (the
 highest iteration if several exist), so the iteration number of each variant
 need not be known:

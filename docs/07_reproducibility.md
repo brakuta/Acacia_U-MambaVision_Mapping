@@ -16,35 +16,50 @@
 | Random crop, horizontal flip, photometric perturbation (§3.5) | `train_pipeline` |
 | Best validation checkpoint retained (§3.5) | `CheckpointHook(save_best='mIoU')` |
 | Metrics: precision, recall, mIoU, mF-score (§3.6) | `IoUMetric(iou_metrics=['mIoU','mFscore'])` |
-| Docker on a TITAN RTX workstation, 64 GB RAM (§3.5) | `docker/Dockerfile` (PyTorch 2.6.0 + CUDA 11.8 base) |
+| Docker on a TITAN RTX workstation, 64 GB RAM (§3.5) | `docker/Dockerfile` (PyTorch 2.6.0 + CUDA 11.8 base); the original container definition is archived as `docs/reference/Dockerfile.original` |
 
-## 7.2 Discrepancies requiring the authors' confirmation
+## 7.2 Reconciliation with the original training logs
 
-1. **Learning rate.** The paper reports an initial learning rate of 1 × 10⁻⁵.
-   The released small/base configs use 1 × 10⁻⁴ with a backbone multiplier of
-   0.1, i.e. 1 × 10⁻⁵ for the encoder and 1 × 10⁻⁴ for the decoder. The
-   released tiny config uses 1 × 10⁻⁵ (encoder 1 × 10⁻⁶). The configs are
-   kept verbatim; the paper's statement most plausibly refers to the encoder
-   rate of the small/base runs.
-2. **Iterations of the tiny variant.** The tiny config specifies 150 000
-   iterations, the paper and the other variants 100 000. The released
-   U-MV-tiny checkpoint is named `_latest`, so the iteration at which it was
-   saved is recorded in its `meta['iter']` field
-   (`tools/inspect_checkpoint.py`).
-3. **`data_preprocessor.size`.** (512, 512) in the tiny config versus
-   (1024, 1024) elsewhere; inert for 1024 × 1024 tiles (padding only).
-4. **Seeds.** No seed was fixed in the original configs; runs are therefore
-   not bit-reproducible. For controlled comparisons add
+The MMSegmentation work directories of the three published runs were
+recovered in September 2026 and their logs compared with the paper and the
+released configurations.
+
+1. **Learning rate.** All three runs used a base learning rate of 1 × 10⁻⁴
+   with a backbone multiplier of 0.1; the logs list every encoder parameter
+   at 1 × 10⁻⁵. The paper's "initial learning rate of 1 × 10⁻⁵" therefore
+   refers to the encoder rate. The configs in this repository reproduce the
+   logged setting.
+2. **Schedule of the tiny variant.** The tiny log shows 100 000 iterations
+   with validation every 5 000, identical to small and base, and reports the
+   best validation mIoU (87.91 %, as in Table 1 of the paper) at iteration
+   100 000. The tiny config released earlier (lr 1 × 10⁻⁵, 150 000
+   iterations) did not correspond to the run and has been aligned with the
+   log.
+3. **Checkpoints.** The released files are byte-identical (SHA-256) to
+   `best_mIoU_iter_100000.pth` (tiny), `best_mIoU_iter_95000.pth` (small)
+   and `best_mIoU_iter_60000.pth` (base) of the work directories, i.e. the
+   best-validation checkpoints used for the paper's test results.
+4. **Seeds.** No seed was fixed; runs are not bit-reproducible. For
+   controlled comparisons add
    `--cfg-options randomness.seed=0 randomness.deterministic=True`.
-5. **MMSegmentation revision.** The original installation used the `main`
-   branch; v1.2.2 is the last tagged release and is API-identical for the
-   components used here.
+5. **MMSegmentation revision.** The original container installed the `main`
+   branch (`docs/reference/Dockerfile.original`); v1.2.2 is the last tagged
+   release and is API-identical for the components used here.
 6. **Channel order at inference.** The original inference scripts swapped
    channels to BGR before the network; the revised pipeline feeds RGB, which
    is what the training preprocessor produced (`docs/05_inference.md`, §5.4).
-   Regional maps produced with the old scripts and with the revised pipeline
-   may therefore differ slightly; a re-evaluation on the test split with
-   `tools/test.py` (unaffected by this change) provides the reference.
+   Regional maps produced with the old scripts may therefore differ
+   slightly; `tools/test.py` is unaffected and provides the reference.
+7. **Training split of the archived dataset.** The archived `train` folder
+   holds 4 893 tiles (1024 × 1024, identical in every copy found), whereas
+   the paper reports 26 615. The tile indices run from 0 to 19 765 with
+   gaps, and some files carry modification dates after the training runs
+   (August 2025), which indicates that the training folder was pruned after
+   the models were trained. Validation (2 407; the logs evaluate 1 204
+   batches of 2), test (3 123) and generalisability (2 162) tiles are
+   complete. Consequently, evaluation and inference with the released
+   checkpoints are fully reproducible from the archive, whereas retraining
+   from the archive reproduces the recipe but not the published model.
 
 ## 7.3 What is and is not fixed by the pinned environment
 
