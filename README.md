@@ -68,7 +68,7 @@ docs/                        01 installation … 08 hand-over checklist, REVISIO
 ```bash
 git clone https://github.com/brakuta/U-MV-Acacia-tortilis-Crown-Mapping.git
 cd U-MV-Acacia-tortilis-Crown-Mapping
-git lfs install && git lfs pull                       # released checkpoints (~815 MB), optional
+git lfs install && git lfs pull                       # released checkpoints; unnecessary if the project archive is available
 cp docker/.env.example docker/.env                    # set DATA_DIR (dataset) and WEIGHTS_DIR (checkpoints)
 docker compose --env-file docker/.env -f docker/docker-compose.yml build   # 30-60 min (compiles MMCV, mamba-ssm)
 docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm umv

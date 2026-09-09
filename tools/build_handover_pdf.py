@@ -180,11 +180,12 @@ def heading(level, text):
 def md_to_flowables(md: str, skip_h1=False):
     out, lines, i = [], md.splitlines(), 0
     para, bullets, num_items, table = [], [], [], []
+    num_next = [1]  # running start for numbered lists interrupted by code blocks
 
     def flush_para():
         nonlocal para
         if para:
-            out.append(Paragraph(inline(' '.join(para)), S['body'])); para = []
+            out.append(Paragraph(inline(' '.join(para)), S['body'])); para = []; num_next[0] = 1
 
     def flush_lists():
         nonlocal bullets, num_items
@@ -194,8 +195,9 @@ def md_to_flowables(md: str, skip_h1=False):
             out.append(Spacer(1, 4)); bullets = []
         if num_items:
             out.append(ListFlowable([ListItem(Paragraph(inline(b), S['bullet']), leftIndent=14) for b in num_items],
-                                    bulletType='1', bulletFontName='Serif', bulletFontSize=10, leftIndent=16))
-            out.append(Spacer(1, 4)); num_items = []
+                                    bulletType='1', bulletFontName='Serif', bulletFontSize=10, leftIndent=16,
+                                    start=num_next[0]))
+            out.append(Spacer(1, 4)); num_next[0] += len(num_items); num_items = []
 
     def flush_table():
         nonlocal table
@@ -222,6 +224,7 @@ def md_to_flowables(md: str, skip_h1=False):
             lvl = len(m.group(1))
             if not (lvl == 1 and skip_h1):
                 out.extend(heading(lvl, m.group(2)))
+            num_next[0] = 1
             i += 1; continue
         m = re.match(r'^\s*[-*]\s+(.*)', ln)
         if m and not ln.startswith('    '):
@@ -344,10 +347,11 @@ NUM.chapter('1')
 story += [PageBreak()] + heading(1, 'Purpose and scope of this document')
 story += md_to_flowables("""
 This document accompanies the hand-over of the U-MV (U-shaped MambaVision) framework for *Acacia tortilis*
-crown mapping. It is written for a team member who receives (i) the repository and (ii) a single folder,
-`A.tortilis_Data & Model`, containing the training data and the original MMSegmentation work directories, and who
-must be able to install the software, verify it, reproduce the published accuracy figures and produce regional
-crown maps from new UAV orthomosaics without further assistance.
+crown mapping. It is written for a team member who has (i) the public repository and (ii) read access to the
+project archive `A.tortilis_Data & Model` on the shared drive, which holds the dataset and the original
+MMSegmentation work directories with the trained checkpoints. It enables that person to install the software,
+verify it, reproduce the published accuracy figures and produce regional crown maps from new UAV orthomosaics
+without further assistance.
 
 The document consolidates the repository documentation (`README.md`, `docs/01` to `docs/08`, `docs/REVISION_NOTES.md`)
 into one reference. The repository remains the authoritative source; where the two differ, the repository is more
@@ -355,12 +359,14 @@ recent.
 
 ## How to use this document
 
-- Chapters 2 and 3 describe the framework and the material handed over.
-- Chapters 4 to 8 give installation, data, training, evaluation and inference procedures in the order they are needed.
-- Chapter 9 is a checklist with an expected outcome for every step; it is the shortest path to a working setup.
-- Chapter 10 maps the paper to the configuration files and lists known discrepancies.
-- Chapter 11 lists failure modes with remedies. Appendices record what changed in the code revision of September 2026
-  and provide a command reference.
+- **Chapter 3 is the shortest path**: what to copy, how to configure, and a step table with an expected outcome
+  for every step. A reader in a hurry can work from chapter 3 alone.
+- Chapter 2 describes the framework; chapters 4 to 8 give the full installation, data, training, evaluation and
+  inference reference behind the steps of chapter 3.
+- Chapter 9 maps the paper to the configuration files and records the reconciliation with the original
+  training logs. Chapter 10 lists failure modes with remedies.
+- Appendices record what changed in the code revision of September 2026, describe the released weights, and
+  provide a command reference.
 
 ## Conventions
 
@@ -402,11 +408,9 @@ Values in percent (paper, Table 1). On the generalisability set (~11 km², 2 165
 (base) for 100 000 iterations.
 """)
 
-# 3 what is handed over
-h08 = read('docs/08_handover_checklist.md')
-part_a, part_b = split_md(h08, '## Step-by-step')
-part_a = part_a.split('\n', 1)[1]  # drop title line
-story += chapter('3', 'Material handed over', part_a)
+# 3 hand-over guide (complete procedure)
+h08 = read('docs/08_handover_checklist.md').split('\n', 1)[1]  # drop title line
+story += chapter('3', 'Hand-over guide: what you receive and how to proceed', h08)
 
 # 4-8
 story += chapter('4', 'Software environment and installation', read('docs/01_installation.md'))
@@ -414,11 +418,9 @@ story += chapter('5', 'Data', read('docs/02_data_preparation.md'))
 story += chapter('6', 'Training', read('docs/03_training.md'))
 story += chapter('7', 'Evaluation', read('docs/04_evaluation.md'))
 story += chapter('8', 'Regional inference on orthomosaics', read('docs/05_inference.md'))
-# 9 checklist
-story += chapter('9', 'Hand-over procedure (step by step)', part_b)
-# 10, 11
-story += chapter('10', 'Reproducibility and paper-to-code mapping', read('docs/07_reproducibility.md'))
-story += chapter('11', 'Troubleshooting', read('docs/06_troubleshooting.md'))
+# 9, 10
+story += chapter('9', 'Reproducibility and paper-to-code mapping', read('docs/07_reproducibility.md'))
+story += chapter('10', 'Troubleshooting', read('docs/06_troubleshooting.md'))
 
 # appendices
 story += chapter('A', 'Revision notes (September 2026)', read('docs/REVISION_NOTES.md'))

@@ -43,7 +43,7 @@ MambaVision does **not** call `causal_conv1d`; that package is optional.
 ```bash
 git clone https://github.com/brakuta/U-MV-Acacia-tortilis-Crown-Mapping.git
 cd U-MV-Acacia-tortilis-Crown-Mapping
-git lfs install && git lfs pull            # released checkpoints (~815 MB), optional
+git lfs install && git lfs pull            # released checkpoints; skip if the project archive is available
 cp docker/.env.example docker/.env && nano docker/.env   # DATA_DIR, WEIGHTS_DIR
 docker compose --env-file docker/.env -f docker/docker-compose.yml build
 ```

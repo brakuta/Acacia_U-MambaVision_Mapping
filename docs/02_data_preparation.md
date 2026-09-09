@@ -30,13 +30,16 @@ Directory layout (mounted at `/data` in the container):
 ```
 /data
 ├── img_dir/
-│   ├── train/            26 615 pairs in the paper
-│   ├── val/               2 400
-│   ├── test/              3 125   (in-distribution test)
-│   └── Generalizability/  2 165   (out-of-distribution test, separate region)
+│   ├── train/             4 893 pairs in the archive (26 615 used for the published models)
+│   ├── val/               2 407
+│   ├── test2/             3 123   (in-distribution test)
+│   └── Generalizability/  2 162   (out-of-distribution test, separate region)
 └── ann_dir/
-    ├── train/  val/  test/  Generalizability/
+    ├── train/  val/  test2/  Generalizability/
 ```
+
+The archived training folder was pruned after the published runs (see the
+reproducibility chapter); the other three splits are complete.
 
 A different root is selected without editing configs:
 
@@ -66,7 +69,7 @@ without renaming: `python tools/test.py <config> <ckpt> --test-split test2`.
 ```python
 import numpy as np, rasterio, glob, os
 root = '/data'
-for split in ['train', 'val', 'test', 'Generalizability']:
+for split in ['train', 'val', 'test2', 'Generalizability']:
     imgs = sorted(glob.glob(f'{root}/img_dir/{split}/*.tif'))
     anns = sorted(glob.glob(f'{root}/ann_dir/{split}/*.tif'))
     assert [os.path.basename(p) for p in imgs] == [os.path.basename(p) for p in anns], split
