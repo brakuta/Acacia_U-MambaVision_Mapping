@@ -8,8 +8,10 @@ import os
 import os.path as osp
 
 import _bootstrap  # noqa: F401
-from mmengine.config import Config, DictAction
+from mmengine.config import DictAction
 from mmengine.runner import Runner
+
+from umv.compat import load_config
 
 
 # TODO: support fuse_conv_bn, visualization, and format_only
@@ -93,7 +95,7 @@ def main():
     args = parse_args()
 
     # load config
-    cfg = Config.fromfile(args.config)
+    cfg = load_config(args.config)  # also accepts legacy work-dir configs
     cfg.launcher = args.launcher
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)

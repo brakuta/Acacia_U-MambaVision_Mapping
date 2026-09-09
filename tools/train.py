@@ -7,11 +7,12 @@ import os
 import os.path as osp
 
 import _bootstrap  # noqa: F401
-from mmengine.config import Config, DictAction
+from mmengine.config import DictAction
 from mmengine.logging import print_log
 from mmengine.runner import Runner
 
 from mmseg.registry import RUNNERS
+from umv.compat import load_config
 
 
 def parse_args():
@@ -58,7 +59,7 @@ def main():
     args = parse_args()
 
     # load config
-    cfg = Config.fromfile(args.config)
+    cfg = load_config(args.config)  # also accepts legacy work-dir configs
     cfg.launcher = args.launcher
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)

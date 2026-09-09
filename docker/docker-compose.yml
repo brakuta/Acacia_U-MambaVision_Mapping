@@ -1,9 +1,10 @@
-# docker compose -f docker/docker-compose.yml build
-# docker compose -f docker/docker-compose.yml run --rm umv            # interactive shell
-# docker compose -f docker/docker-compose.yml run --rm umv python tools/verify_install.py --variant small
+# cp docker/.env.example docker/.env   # then edit DATA_DIR and WEIGHTS_DIR
+# docker compose --env-file docker/.env -f docker/docker-compose.yml build
+# docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm umv   # interactive shell
 #
-# Set DATA_DIR to the host folder holding the dataset / orthomosaics.  On WSL2 a
-# Windows drive is reachable as /mnt/<letter>, e.g. DATA_DIR=/mnt/h/UAV_Data.
+# Inside the container: dataset at /data, checkpoints at /weights (read-only),
+# training outputs in /workspace/U-MV/work_dirs.  On WSL2 a Windows drive is
+# reachable as /mnt/<letter>; paths with spaces must be quoted in docker/.env.
 services:
   umv:
     image: umv:latest
@@ -25,6 +26,7 @@ services:
     volumes:
       - ..:/workspace/U-MV                     # live source tree (edits visible immediately)
       - ${DATA_DIR:-./data}:/data              # dataset and orthomosaics
+      - ${WEIGHTS_DIR:-./Pretrained_Weights}:/weights:ro   # checkpoints / original work dirs
       - hf_cache:/workspace/hf_cache           # MambaVision code + ImageNet weights
       - ${WORK_DIRS:-../work_dirs}:/workspace/U-MV/work_dirs
       - ${SCRATCH_DIR:-umv_scratch}:/tmp/geospatial_work

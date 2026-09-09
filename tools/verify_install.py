@@ -29,6 +29,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--variant', choices=['tiny', 'small', 'base'], default=None)
     p.add_argument('--checkpoint', default=None)
+    p.add_argument('--config', default=None, help='config to build (default: repo config of --variant)')
     p.add_argument('--size', type=int, default=512)
     p.add_argument('--device', default=None)
     a = p.parse_args()
@@ -63,11 +64,11 @@ def main():
 
     if a.variant:
         device = a.device or ('cuda:0' if cuda else 'cpu')
-        from mmengine.config import Config
         from mmseg.registry import MODELS
         from mmseg.utils import register_all_modules
+        from umv.compat import load_config
         register_all_modules(init_default_scope=True)
-        cfg = Config.fromfile(f'configs/mambavision/U-MV-{a.variant}.py')
+        cfg = load_config(a.config or f'configs/mambavision/U-MV-{a.variant}.py')
         if a.checkpoint:
             cfg.model.backbone['pretrained'] = False
         t0 = time.time()

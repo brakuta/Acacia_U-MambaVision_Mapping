@@ -66,10 +66,11 @@ def load_segmentor(config: str, checkpoint: str, device: str = 'cuda:0',
     The backbone is instantiated without downloading ImageNet weights
     (``pretrained=False``) because the checkpoint supplies all parameters.
     """
-    from mmengine.config import Config
     from mmseg.apis import init_model
 
-    cfg = Config.fromfile(config)  # executes custom_imports (registers umv)
+    from ..compat import load_config
+
+    cfg = load_config(config)  # registers umv; accepts legacy work-dir configs
     bb = cfg.model.get('backbone', {})
     if isinstance(bb, dict) and 'pretrained' in bb or str(bb.get('type', '')).startswith(
             ('MambaVision', 'mamba_')):
