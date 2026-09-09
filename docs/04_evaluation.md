@@ -12,9 +12,9 @@ are the quantities of ecological interest.
 
 ```bash
 CKPT="/weights/mambavision-s_generic-unet_acacia-88"   # folder -> its best_mIoU_iter_*.pth
-python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split test2            # in-distribution
-python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split Generalizability # out-of-distribution
-python tools/test.py configs/mambavision/U-MV-small.py work_dirs/U-MV-small --test-split test2   # own run
+python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split test2              # test
+python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split Generalizability   # OOD
+python tools/test.py configs/mambavision/U-MV-small.py work_dirs/U-MV-small --test-split test2 # own run
 # released checkpoints (identical to the best_mIoU files; after git lfs pull)
 for v in tiny small base; do
   python tools/test.py configs/mambavision/U-MV-$v.py Pretrained_Weights/U-MV-${v}_latest.pth --test-split test2
