@@ -11,26 +11,18 @@ are the quantities of ecological interest.
 ## 4.2 Commands
 
 ```bash
-# original work directory: the folder resolves to its best_mIoU_iter_*.pth
-CKPT="/weights/mambavision-s_generic-unet_acacia-88"
-
-# in-distribution test split (named test2 in the archive)
-python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split test2
-
-# out-of-distribution split
-python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split Generalizability
-
-# a checkpoint from your own training run
-python tools/test.py configs/mambavision/U-MV-small.py work_dirs/U-MV-small --test-split test2
-
+CKPT="/weights/mambavision-s_generic-unet_acacia-88"   # folder -> its best_mIoU_iter_*.pth
+python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split test2            # in-distribution
+python tools/test.py configs/mambavision/U-MV-small.py "$CKPT" --test-split Generalizability # out-of-distribution
+python tools/test.py configs/mambavision/U-MV-small.py work_dirs/U-MV-small --test-split test2   # own run
 # released checkpoints (identical to the best_mIoU files; after git lfs pull)
-python tools/test.py configs/mambavision/U-MV-tiny.py  Pretrained_Weights/U-MV-tiny_latest.pth  --test-split test2
-python tools/test.py configs/mambavision/U-MV-small.py Pretrained_Weights/U-MV-small_latest.pth --test-split test2
-python tools/test.py configs/mambavision/U-MV-base.py  Pretrained_Weights/U-MV-base_latest.pth  --test-split test2
+for v in tiny small base; do
+  python tools/test.py configs/mambavision/U-MV-$v.py Pretrained_Weights/U-MV-${v}_latest.pth --test-split test2
+done
 ```
 
-Without `--test-split`, the config's default split `img_dir/test` is used;
-rename `test2` to `test` or pass the option.
+Without `--test-split` the config's default split `img_dir/test` is used
+(the archive names it `test2`).
 
 Options:
 
@@ -42,8 +34,7 @@ Options:
 | `--show-dir DIR` | Save colour overlays (input, ground truth, prediction). |
 | `--tta` | Multi-scale (0.5–1.75) + horizontal-flip test-time augmentation (slower; not used in the paper). |
 
-Inference during evaluation uses the sliding-window mode of the config
-(1024 × 1024 window, 512 stride), which matches training resolution.
+Evaluation uses the config's sliding-window mode (1024 × 1024 window, stride 512).
 
 ## 4.3 Reference results (paper, Table 1)
 
