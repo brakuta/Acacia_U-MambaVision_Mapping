@@ -26,11 +26,24 @@ A checkpoint obtained elsewhere (e.g. a `best_mIoU_iter_*.pth` from a
 `work_dirs/` folder) can be used directly by passing its path to
 `tools/test.py` or the inference scripts; no renaming is required.
 
+## Provenance (verified September 2026)
+
+The released files are byte-identical to the best-validation checkpoints of
+the original MMSegmentation work directories (SHA-256 verified):
+
+| Released file | Work directory | Checkpoint | Iteration |
+|---|---|---|---|
+| `U-MV-tiny_latest.pth` | `mambavision-t_generic-unet_acacia` | `best_mIoU_iter_100000.pth` | 100 000 |
+| `U-MV-small_latest.pth` | `mambavision-s_generic-unet_acacia-88` | `best_mIoU_iter_95000.pth` | 95 000 |
+| `U-MV-base_latest.pth` | `mambavision-b_generic-unet_acacia` | `best_mIoU_iter_60000.pth` | 60 000 |
+
+The `_latest` suffix therefore denotes the latest release, not the last
+training iteration. `iter_100000.pth` files in the work directories are the
+final-iteration checkpoints and were not released.
+
 ## Original work directories
 
-If the MMSegmentation work directories of the published runs are available
-(`mambavision-{t,s,b}_generic-unet_acacia*`), prefer their `best_mIoU_iter_*.pth`
-files. Passing the folder itself to any tool selects that file:
+Passing a work-directory folder to any tool selects its `best_mIoU_iter_*.pth`:
 
 ```bash
 python tools/inspect_checkpoint.py "/weights/mambavision-s_generic-unet_acacia-88"

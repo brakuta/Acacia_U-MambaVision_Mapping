@@ -16,7 +16,7 @@
 | Random crop, horizontal flip, photometric perturbation (§3.5) | `train_pipeline` |
 | Best validation checkpoint retained (§3.5) | `CheckpointHook(save_best='mIoU')` |
 | Metrics: precision, recall, mIoU, mF-score (§3.6) | `IoUMetric(iou_metrics=['mIoU','mFscore'])` |
-| Docker on a TITAN RTX workstation, 64 GB RAM (§3.5) | `docker/Dockerfile` (PyTorch 2.6.0 + CUDA 11.8 base) |
+| Docker on a TITAN RTX workstation, 64 GB RAM (§3.5) | `docker/Dockerfile` (PyTorch 2.6.0 + CUDA 11.8 base); the original container definition is archived as `docs/reference/Dockerfile.original` |
 
 ## 7.2 Discrepancies requiring the authors' confirmation
 
@@ -28,9 +28,11 @@
    rate of the small/base runs.
 2. **Iterations of the tiny variant.** The tiny config specifies 150 000
    iterations, the paper and the other variants 100 000. The released
-   U-MV-tiny checkpoint is named `_latest`, so the iteration at which it was
-   saved is recorded in its `meta['iter']` field
-   (`tools/inspect_checkpoint.py`).
+   U-MV-tiny checkpoint is `best_mIoU_iter_100000.pth` (SHA-256 verified
+   against the work directory); the base checkpoint is
+   `best_mIoU_iter_60000.pth` and the small one `best_mIoU_iter_95000.pth`.
+   Whether the tiny run continued to 150 000 iterations can be read from its
+   log in the work directory.
 3. **`data_preprocessor.size`.** (512, 512) in the tiny config versus
    (1024, 1024) elsewhere; inert for 1024 × 1024 tiles (padding only).
 4. **Seeds.** No seed was fixed in the original configs; runs are therefore
@@ -45,6 +47,14 @@
    Regional maps produced with the old scripts and with the revised pipeline
    may therefore differ slightly; a re-evaluation on the test split with
    `tools/test.py` (unaffected by this change) provides the reference.
+
+7. **Training split of the archived dataset.** The hand-over folder holds
+   4 893 training tiles, whereas the paper reports 26 615. Validation
+   (2 407), test (3 123) and generalisability (2 162) tiles are essentially
+   complete (paper: 2 400, 3 125, 2 165). Evaluation and inference are
+   therefore fully reproducible from the folder; retraining to the published
+   accuracy requires the complete training set, whose location is being
+   confirmed.
 
 ## 7.3 What is and is not fixed by the pinned environment
 

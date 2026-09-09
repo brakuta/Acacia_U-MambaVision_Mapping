@@ -1,0 +1,69 @@
+# Original Dockerfile of the container in which the published experiments were run
+# (recovered from "A.tortilis Models/MMsegmentation Folder/docker/Dockerfile", September 2026).
+# Kept for the record; the maintained build is docker/Dockerfile. Notable facts:
+#   * base image pytorch/pytorch:2.6.0-cuda11.8-cudnn9-devel (as in docker/Dockerfile);
+#   * mmcv 2.1.0 via `mim install` (source build for PyTorch 2.6), mmsegmentation from the
+#     `main` branch installed editable, mmdetection installed for Mask2Former experiments;
+#   * mamba-ssm was installed inside the running container (not in this file); the frozen
+#     environment (environment.frozen.yml) records mamba-ssm 2.2.4.
+# syntax = docker/dockerfile:1.4
+ARG PYTORCH="2.6.0"
+ARG CUDA="11.8"
+ARG CUDNN="9"
+ARG MMCV="2.1.0"
+FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
+
+# 1) System deps + curl & bash
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+      git \
+      ninja-build \
+      libglib2.0-0 \
+      libsm6 \
+      libxrender-dev \
+      libxext6 \
+      libgl1-mesa-dev \
+      curl \
+      bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2) Use Bash for RUNs (so `source` works, if used)
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# 3) Install Rust toolchain
+RUN --mount=type=cache,target=/root/.rustup \
+    set -eux; \
+    curl --location --fail \
+      "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init" \
+      --output /usr/local/bin/rustup-init; \
+    chmod +x /usr/local/bin/rustup-init; \
+    rustup-init -y --no-modify-path --default-toolchain stable; \
+    rm /usr/local/bin/rustup-init
+
+# 4) Expose Cargo bin via ENV
+ENV PATH="/root/.cargo/bin:${PATH}"
+ARG MMCV
+# 5) Install MMCV & mmengine
+RUN pip install --upgrade pip openmim && \
+    mim install mmengine && \
+    mim install mmcv==${MMCV}
+
+# 6) Prepare workdir for bind mount
+RUN git clone -b main https://github.com/open-mmlab/mmsegmentation.git /mmsegmentation
+WORKDIR /mmsegmentation
+# 7) Install Python deps in editable mode
+RUN pip install --no-cache-dir -e .
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential pkg-config libssl-dev            curl && rm -rf /var/lib/apt/lists/*
+
+# 2. Install Rust toolchain
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    export PATH="$HOME/.cargo/bin:$PATH"
+
+RUN git clone https://github.com/open-mmlab/mmdetection.git
+WORKDIR mmdetection
+RUN   pip install -v  .
+RUN cd ..
+
+WORKDIR /mmsegmentation
