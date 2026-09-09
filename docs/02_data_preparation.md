@@ -86,24 +86,20 @@ for split in ['train', 'val', 'test', 'Generalizability']:
 3. Convert masks to 8-bit unsigned (`Copy Raster`, pixel type 8_BIT_UNSIGNED)
    and verify with the script above.
 
-## 2.5 Archive versus working copy
+## 2.5 Location of the dataset
 
-The archival dataset on the shared drive (`Z:\...\A.tortilis_Data & Model\Data
-used to build the model\img_dir`) should be left untouched. For training and
-evaluation make a working copy on a local disk, because random reads of ~30 000
-tiles per epoch over SMB (or through WSL2's `drvfs`) starve the GPU:
+The dataset folder can reside anywhere; its path is supplied once in
+`docker/.env` (`DATA_DIR`) or on the command line
+(`--cfg-options train_dataloader.dataset.data_root=...`). Prefer a local SSD
+over a network share, because training performs ~30 000 random tile reads per
+epoch. When copying, ArcGIS side-cars can be excluded:
 
 ```powershell
-# Windows PowerShell: local working copy without ArcGIS side-cars (~80 GB for train)
-robocopy "Z:\Final Geodatabase\Vegetation_Geodatabase\3_Mapping Acacia tortilis Trees\A.tortilis_Data & Model\Data used to build the model" `
-         "D:\UAV_Acacia_Data" /E /XF *.aux.xml *.ovr *.xml /MT:16
+robocopy "<source>\Data used to build the model" "D:\UAV_Acacia_Data" /E /XF *.aux.xml *.ovr *.xml /MT:16
 ```
 
-Then mount it in the container with `DATA_DIR=/mnt/d/UAV_Acacia_Data`. If the
-shared drive must be read directly, mount it in WSL2 first
-(`sudo mkdir -p /mnt/z && sudo mount -t drvfs Z: /mnt/z`) and quote the path,
-since it contains spaces and an ampersand:
-`DATA_DIR="/mnt/z/Final Geodatabase/.../Data used to build the model"`.
+If a network drive must be read directly from WSL2, mount it first
+(`sudo mkdir -p /mnt/z && sudo mount -t drvfs Z: /mnt/z`) and quote the path.
 
 ## 2.6 Orthomosaics for regional inference
 

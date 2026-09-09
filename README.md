@@ -68,11 +68,13 @@ docs/                        01 installation … 08 hand-over checklist, REVISIO
 ```bash
 git clone https://github.com/brakuta/U-MV-Acacia-tortilis-Crown-Mapping.git
 cd U-MV-Acacia-tortilis-Crown-Mapping
-git lfs install && git lfs pull                       # released checkpoints (~815 MB)
-docker compose -f docker/docker-compose.yml build     # 30-60 min (compiles MMCV, mamba-ssm)
-DATA_DIR=/mnt/h/UAV_Data docker compose -f docker/docker-compose.yml run --rm umv
-# inside the container
+git lfs install && git lfs pull                       # released checkpoints (~815 MB), optional
+cp docker/.env.example docker/.env                    # set DATA_DIR (dataset) and WEIGHTS_DIR (checkpoints)
+docker compose --env-file docker/.env -f docker/docker-compose.yml build   # 30-60 min (compiles MMCV, mamba-ssm)
+docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm umv
+# inside the container: dataset at /data, checkpoints at /weights
 python tools/verify_install.py --variant small
+python tools/check_dataset.py /data --splits train val test2 Generalizability
 ```
 
 Manual installation (conda, CUDA 11.8 toolkit with `nvcc`) is described in
@@ -135,7 +137,12 @@ Parameters, channel-order caveat and output attributes:
 | U-MV-base | MambaVision-B-1K (128/256/512/1024) | `Pretrained_Weights/U-MV-base_latest.pth` | 422 MB |
 
 `python tools/inspect_checkpoint.py <file>.pth` identifies the variant of any
-local checkpoint. See [Pretrained_Weights/README.md](Pretrained_Weights/README.md).
+local checkpoint. Checkpoints and training configs from the original
+MMSegmentation work directories (`best_mIoU_iter_*.pth`,
+`mambavision-*_generic-unet_acacia.py`) are accepted directly by every tool;
+legacy configs are translated on load by `umv.compat.load_config`. See
+[Pretrained_Weights/README.md](Pretrained_Weights/README.md) and
+[docs/08_handover_checklist.md](docs/08_handover_checklist.md).
 
 ## Reproducibility and hand-over
 

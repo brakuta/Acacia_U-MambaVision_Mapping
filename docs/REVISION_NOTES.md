@@ -45,6 +45,15 @@ auxiliary code, portability and documentation.
   variant detection and the end-to-end inference pipeline on synthetic
   GeoTIFFs (CPU).
 
+## Compatibility with the archived work directories
+
+`umv/compat.py::load_config` detects configs that import
+`mmseg.custom_models.*` (the archived training configs) and maps them to the
+new package, including `ADE20KDataset` -> `UAVAcaciaDataset`. All tools use
+it, so `tools/test.py <archived config> <archived checkpoint>` works without
+edits. `docker/.env` (`DATA_DIR`, `WEIGHTS_DIR`) decouples the container from
+the location of the hand-over folder.
+
 ## Validation performed in this revision
 
 * All three configs load; models build with a stub encoder and run a training

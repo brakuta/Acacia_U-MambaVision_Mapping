@@ -44,7 +44,8 @@ MambaVision does **not** call `causal_conv1d`; that package is optional.
 git clone https://github.com/brakuta/U-MV-Acacia-tortilis-Crown-Mapping.git
 cd U-MV-Acacia-tortilis-Crown-Mapping
 git lfs install && git lfs pull            # released checkpoints (~815 MB), optional
-docker compose -f docker/docker-compose.yml build
+cp docker/.env.example docker/.env && nano docker/.env   # DATA_DIR, WEIGHTS_DIR
+docker compose --env-file docker/.env -f docker/docker-compose.yml build
 ```
 
 The build compiles MMCV and mamba-ssm and typically takes 30–60 min. The
@@ -55,15 +56,16 @@ for other GPUs before building.
 ### Run
 
 ```bash
-export DATA_DIR=/mnt/h/UAV_Data           # host folder mounted at /data
-docker compose -f docker/docker-compose.yml run --rm umv
+cp docker/.env.example docker/.env        # set DATA_DIR and WEIGHTS_DIR (quoted if they contain spaces)
+docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm umv
 # inside the container
 python tools/verify_install.py --variant small
 ```
 
 The compose file bind-mounts the repository at `/workspace/U-MV`, the dataset at
-`/data`, a named volume for the Hugging Face cache and `work_dirs/` for training
-outputs. `docker/run.sh` offers the same without compose.
+`/data`, the checkpoint folder read-only at `/weights`, a named volume for the
+Hugging Face cache and `work_dirs/` for training outputs. `docker/run.sh` offers
+the same without compose and reads the same `docker/.env`.
 
 ### Offline use
 
