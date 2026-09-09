@@ -1,307 +1,183 @@
+# U-MV: Regional-scale *Acacia tortilis* crown mapping from UAV imagery
 
-# Regional-Scale *Acacia tortilis* Crown Mapping from UAV Imagery (U-MV)
+**U-MV (U-shaped MambaVision)** is a lightweight hybrid segmentation framework
+that couples a MambaVision encoder (Mamba + Transformer + CNN) with a compact
+U-Net-style decoder for delineating *Acacia tortilis* crowns in ultra-high
+resolution UAV orthomosaics. It is implemented as an extension of
+[MMSegmentation](https://github.com/open-mmlab/mmsegmentation) and ships
+training configurations, released checkpoints and geospatial inference tools
+that export crown polygons directly to GIS formats.
 
-**U-MV (U-Shape-MambaVision)** — A lightweight U-shaped semantic segmentation framework (U-Net–style decoder + **MambaVision** backbone) for delineating *Acacia tortilis* crowns in ultra-high-resolution UAV imagery. Built on **MMSegmentation**.
+Official implementation of:
 
-This repository provides the official implementation for the paper:
-**"Regional-Scale *Acacia tortilis* Crown Mapping from UAV Remote Sensing Using Semi-Automated Annotation and a Lightweight Hybrid Segmentation Framework"** by M.B.A Gibril et al., 2026.
-
-
-## 🧠 U-MV Architecture
+> Gibril, M. B. A., Al-Ruzouq, R., Shanableh, A., Lamghari, F., El-Keblawy, A.,
+> Hammouri, N., Makawy, S., Jena, R., Mansour, A., Ghebremeskel, S. Z.,
+> Alafayfeh, N. S., Almarzooqi, M. A. (2026). *Regional-scale Acacia tortilis
+> crown mapping from UAV remote sensing using semi-automated annotation and a
+> lightweight hybrid segmentation framework.* International Journal of Applied
+> Earth Observation and Geoinformation, 148, 105214.
+> https://doi.org/10.1016/j.jag.2026.105214
 
 <p align="center">
   <img src="Assets/mamba_vision_architecture.png" alt="U-MV architecture" width="900">
 </p>
 
-**Figure 1.** Overview of the proposed **U-MV (U-Shape-MambaVision)** framework, which combines a MambaVision backbone with a lightweight U-shaped decoder for *Acacia tortilis* crown segmentation from ultra-high-resolution UAV imagery.
+**Figure 1.** U-MV: four-stage MambaVision encoder (strides 4–32) and U-Net
+decoder with skip connections, applied to 1024 × 1024 UAV tiles.
 
-## 🌟 Highlights
-- **Architecture:** Integrates **MambaVision** backbones (from Hugging Face: `nvidia/MambaVision-*-1K`) with a U-Net–style decoder over four feature pyramid levels.
-- **Reproducible Configurations:** Provides ready-to-use configurations for **Tiny, Small, and Base** model variants.
-- **Geospatial Utilities:** Features specialized inference tools to convert model predictions into GIS-compatible vector formats (GeoPackage/Shapefile) for direct use in geospatial analyses.
+## Highlights
 
+- **Three variants** (tiny / small / base; 35.4 M and 54.2 M parameters for
+  tiny and small) with released checkpoints; test-set mIoU 85.30–85.44 % and
+  mF-score 91.52–91.61 %.
+- **Self-contained MMSegmentation extension**: `pip install -e .` registers the
+  backbone, decoder and dataset; no files are copied into MMSegmentation.
+- **Reproducible environment**: Dockerfile pinned to the original stack
+  (PyTorch 2.6.0 + CUDA 11.8, MMCV 2.1.0, MMSegmentation 1.2.2, mamba-ssm 2.2.4).
+- **Regional inference**: seam-free sliding-window prediction over gigapixel
+  orthomosaics, streaming vectorisation to GeoPackage/Shapefile with per-crown
+  `area` and `mean_prob` attributes.
 
-## 📝 Table of Contents
-- [Quick Start](#quick-start)
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Data Layout](#data-layout)
-- [Configuration Files](#configuration-files)
-- [Training](#training)
-- [Evaluation](#evaluation)
-- [Inference](#inference)
-- [Reproducibility](#reproducibility)
-- [Citation](#citation)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
-- [Contact](#contact)
+## Repository layout
 
----
+```
+umv/                         installable package (registered with MMSegmentation)
+├── models/mamba_vision.py   MambaVisionBackbone (Hugging Face nvidia/MambaVision-*-1K)
+├── models/unet_head.py      GenericUNetHead (lightweight U-Net decoder)
+├── datasets/uav_acacia.py   UAVAcaciaDataset (background / acacia)
+├── inference/               tiling, blending, vectorisation, pipeline, CLI options
+└── checkpoint.py            checkpoint inspection and variant detection
+configs/
+├── _base_/                  models/umv_unet.py · datasets/uav_acacia_dataset.py ·
+│                            schedules/schedule_100k_adamw.py · default_runtime.py
+└── mambavision/             U-MV-tiny.py · U-MV-small.py · U-MV-base.py
+tools/
+├── train.py, test.py        MMSegmentation v1.2.2 entry points (+ --test-split)
+├── geospatial_inference.py  one orthomosaic -> crown polygons
+├── batch_geospatial_inference.py   folder tree -> crown polygons
+├── verify_install.py, inspect_checkpoint.py, download_backbones.py, check_dataset.py
+docker/                      Dockerfile · docker-compose.yml · run.sh
+requirements/                core.txt · geo.txt · mamba.txt · dev.txt
+Pretrained_Weights/          released checkpoints (Git LFS) + README
+tests/                       CPU unit tests (tiling, vectorisation, pipeline)
+docs/                        01 installation … 08 hand-over checklist, REVISION_NOTES
+```
 
-## 🚀 Quick Start
-
-This project utilizes a **copy-in** workflow, integrating custom components into an MMSegmentation environment. Follow these steps to get started rapidly:
-
-1.  **Clone MMSegmentation and install in editable mode:**
-    ```bash
-    git clone https://github.com/open-mmlab/mmsegmentation.git
-    cd mmsegmentation
-    pip install -v -e .
-    cd ..
-    ```
-
-2.  **Clone this repository:**
-    ```bash
-    git clone https://github.com/brakuta/Acacia_U-MambaVision_Mapping.git
-    ```
-
-3.  **Copy custom code and configurations:**
-    ```bash
-    cp -r Acacia_U-MambaVision_Mapping/mmseg mmsegmentation/
-    cp -r Acacia_U-MambaVision_Mapping/configs mmsegmentation/
-    ```
-
-4.  **Install dependencies (ensure PyTorch CUDA wheels are installed first):**
-    ```bash
-    cd mmsegmentation
-    pip install torch==2.6.0+cu118 torchvision==0.21.0+cu118 torchaudio==2.6.0+cu118 \
-      --index-url https://download.pytorch.org/whl/cu118
-    pip install -r ../Acacia_U-MambaVision_Mapping/requirements.txt
-    ```
-
-## 🛠️ Installation
-
-You can choose between two primary installation workflows:
-
-### Option A — Copy-in (Recommended for quick setup)
-This is the same workflow as described in [Quick Start](#quick-start). It's straightforward and suitable for most users.
-
-1.  Clone and `pip install -e` **MMSegmentation**.
-2.  Clone **this repository**.
-3.  Copy `mmseg/` and `configs/` from this repo into your `mmsegmentation/` directory.
-4.  Install dependencies (PyTorch CUDA wheels first) as shown above.
-
-### Option B — Submodule (Recommended for version control and reproducibility)
-This method integrates MMSegmentation as a Git submodule, which can be beneficial for managing dependencies in larger projects or ensuring specific MMSegmentation versions.
+## Quick start (Docker, recommended)
 
 ```bash
-# From your new project root
-git init
-git submodule add https://github.com/open-mmlab/mmsegmentation.git mmsegmentation
-
-# Install MMSegmentation in editable mode
-cd mmsegmentation && pip install -v -e . && cd ..
-    
-# Bring in this repo's custom code and configurations
-git clone https://github.com/brakuta/Acacia_U-MambaVision_Mapping.git tmp_repo
-cp -r tmp_repo/mmseg mmsegmentation/
-cp -r tmp_repo/configs mmsegmentation/
-rm -rf tmp_repo
-
-# Install dependencies (PyTorch CUDA wheels first)
-cd mmsegmentation
-pip install torch==2.6.0+cu118 torchvision==0.21.0+cu118 torchaudio==2.6.0+cu118 \
-  --index-url https://download.pytorch.org/whl/cu118
-pip install -r ../Acacia_U-MambaVision_Mapping/requirements.txt
+git clone https://github.com/brakuta/U-MV-Acacia-tortilis-Crown-Mapping.git
+cd U-MV-Acacia-tortilis-Crown-Mapping
+git lfs install && git lfs pull                       # released checkpoints (~815 MB), optional
+cp docker/.env.example docker/.env                    # set DATA_DIR (dataset) and WEIGHTS_DIR (checkpoints)
+docker compose --env-file docker/.env -f docker/docker-compose.yml build   # 30-60 min (compiles MMCV, mamba-ssm)
+docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm umv
+# inside the container: dataset at /data, checkpoints at /weights
+python tools/verify_install.py --variant small
+python tools/check_dataset.py /data --splits train val test2 Generalizability
 ```
 
----
-## 📂 Project Structure
+Manual installation (conda, CUDA 11.8 toolkit with `nvcc`) is described in
+[docs/01_installation.md](docs/01_installation.md).
 
-This project extends MMSegmentation by adding custom modules and configuration files. After the installation steps, your mmsegmentation/ directory will contain:  
-
-```
-mmsegmentation/
-├── mmseg/
-│   ├── custom_models/        # Our custom MambaVision backbone and U-Net head
-│   │   ├── mamba_vision.py
-│   │   └── generic_unet_head.py
-│   └── ... (MMSegmentation's original files)
-├── configs/
-│   ├── mambavision/          # Our specific model configurations
-│   │   ├── U-MV-tiny.py
-│   │   ├── U-MV-small.py
-│   │   └── U-MV-base.py
-│   └── ... (MMSegmentation's original configs)
-├── tools/
-│   ├── train.py
-│   ├── test.py
-│   ├── geospatial_inference.py           # Our custom single image inference script
-│   └── Batch_processing_geospatial_inference.py # Our custom batch inference script
-├── requirements.txt          # Project-specific dependencies
-└── ... (Other MMSegmentation files)
-```
----
-## 📦 Pretrained Weights
-
-The pretrained U-MV models used in this study are provided below. These weights correspond to the Tiny, Small, and Base variants of the proposed architecture.
-
-| Model Variant | File | Description | Download |
-|---------------|------|-------------|----------|
-| U-MV-Tiny | `U-MV-tiny_latest.pth` | Lightweight version for efficient inference and lower GPU memory usage | [Download](./Pretrained_Weights/U-MV-tiny_latest.pth) |
-| U-MV-Small | `U-MV-small_latest.pth` | Balanced model providing improved accuracy with moderate computational cost | [Download](./Pretrained_Weights/U-MV-small_latest.pth) |
-| U-MV-Base | `U-MV-base_latest.pth` | Highest-capacity model with improved feature representation and segmentation accuracy | [Download](./Pretrained_Weights/U-MV-base_latest.pth) |
----
-## 🌳 Data Layout
-
-Organize your dataset with separate directories for images (img_dir) and corresponding indexed segmentation masks (ann_dir). Basenames of image and annotation files within corresponding subdirectories (e.g., train, val, test, Generalizability) must match.:  
+## Data layout
 
 ```
-UAV_Acacia_Data/
-├── img_dir/
-│   ├── train/                 # Training images
-│   ├── val/                   # Validation images
-│   ├── test/                  # In-distribution test images
-│   └── Generalizability/      # Out-of-distribution (OOD) test images
-└── ann_dir/
-    ├── train/                 # Training masks
-    ├── val/                   # Validation masks
-    ├── test/                  # In-distribution test masks
-    └── Generalizability/      # Out-of-distribution (OOD) test masks
+/data                                    (DATA_DIR on the host)
+├── img_dir/{train,val,test,Generalizability}/*.tif   RGB, 8-bit, 1024 x 1024
+└── ann_dir/{train,val,test,Generalizability}/*.tif   single-band, 0 = background, 1 = acacia
 ```
 
-- **Images**: `.tif` or common image formats readable by MMSeg.  
-- **Masks**: **indexed** `.png` (preferred) or `.tif` with per‑pixel class IDs (not RGB).  
-- **Classes (binary)**: `0 = background`, `1 = acacia` (adjust if needed).
+Details, integrity checks and ArcGIS Pro export notes:
+[docs/02_data_preparation.md](docs/02_data_preparation.md).
 
-In your configs, set (example):
-```python
-data_root = 'uav_acacia'
-classes = ('background', 'acacia')
-palette = [[0, 0, 0], [0, 255, 0]]
-```
-
----
-
-## ⚙️ Configuration Files
-
-Our custom model configurations are located under mmsegmentation/configs/mambavision/:
-
-```
-mmsegmentation/configs/mambavision/
-  U-MV-tiny.py
-  U-MV-small.py
-  U-MV-base.py
-```
-Each config:
-- Imports the **backbone** from `mmseg/custom_models/mamba_vision.py`
-- Imports the **U‑Net head** from `mmseg/custom_models/generic_unet_head.py`
-- Uses the **custom dataset base** (not ADE20K) and defines your `classes/palette`
-
-> If your custom files are placed in mmseg/custom_models/, you must include the following custom_imports section in your configuration file to ensure they are correctly loaded by MMSegmentation:
-> 
-> ```python
-> custom_imports = dict(
->     imports=[
->         'mmseg.custom_models.mamba_vision',
->         'mmseg.custom_models.generic_unet_head',
->     ],
->     allow_failed_imports=False
-> )
-> ```
-
----
-
-## 🏋️ Training
-
-To train a model, navigate to the mmsegmentation/ directory and run the tools/train.py script with your desired configuration file::
-```bash
-# From inside the mmsegmentation/ directory
-
-# Train the Tiny model
-python tools/train.py configs/mambavision/U-MV-tiny.py
-
-# Train the Small model
-python tools/train.py configs/mambavision/U-MV-small.py
-
-# Train the Base model
-python tools/train.py configs/mambavision/U-MV-base.py
-```
-
-Training Tips:
-- Set `work_dir` in each config to control where checkpoints/logs are saved.
-- For determinism: `env_cfg = dict(cudnn_benchmark=False)` and fix seeds as needed.
-
----
-
-## 📊 Evaluation
-
-If your config defines **two** `test_dataloader` entries for `test` and `Generalizability`, a single command evaluates both:
+## Training
 
 ```bash
-python tools/test.py   configs/mambavision/U-MV-small.py   work_dirs/U-MV-small/latest.pth --eval mIoU mFscore
+python tools/train.py configs/mambavision/U-MV-small.py            # also U-MV-tiny.py, U-MV-base.py
+python tools/train.py configs/mambavision/U-MV-small.py --resume   # continue
 ```
-- Replace `configs/mambavision/U-MV-small.py` with the path to your desired model configuration.
 
-- Replace `work_dirs/U-MV-small/latest.pth` with the path to your trained model checkpoint (e.g., latest.pth for the most recent or a specific epoch checkpoint).
+AdamW (lr 1e-4, backbone × 0.1, weight decay 0.05), polynomial decay, 100k
+iterations, batch 2 × 1024², CE + 3·Dice loss, best-mIoU checkpointing. See
+[docs/03_training.md](docs/03_training.md).
 
-- The `--eval mIoU mFscore` flags specify the evaluation metrics to compute (Mean IoU and Mean F-score are standard for segmentation).
-  
----
+## Evaluation
 
-## 🌍 Inference
-
-This project includes **two geospatial inference utilities** that post-process predictions into GIS vector formats (GeoPackage / Shapefile). They assume **georeferenced** source imagery (e.g., GeoTIFF) and require geospatial libs (see `extras/geo-requirements.txt` if provided).
-
-### A) Single image
 ```bash
-python tools/geospatial_inference.py  
+python tools/test.py configs/mambavision/U-MV-small.py Pretrained_Weights/U-MV-small_latest.pth
+python tools/test.py configs/mambavision/U-MV-small.py Pretrained_Weights/U-MV-small_latest.pth --test-split Generalizability
 ```
-**What it does**
-1. Performs tile-wise inference over large input imagery using a sliding window approach to handle memory constraints.  
-2. Reassembles the tile predictions into a full-size raster mask in the original image's Coordinate Reference System (CRS).  
-3. Vectorizes the predicted polygons (e.g., individual tree crowns) from the raster mask.
-4. Optionally filters out small, spurious objects based on a minimum area threshold.
-5. Writes a **GeoPackage** (`.gpkg`) or **ESRI Shapefile** (`.shp`)format, preserving spatial information..
 
-### B) Batch processing (folders of images)
-This script is designed for automated processing of multiple georeferenced images organized within folders.
+Reports mIoU, mF-score, precision and recall per class
+([docs/04_evaluation.md](docs/04_evaluation.md)).
+
+## Regional inference
+
 ```bash
-python tools/Batch_processing_geospatial_inference.py   
+python tools/geospatial_inference.py \
+  --config configs/mambavision/U-MV-small.py --checkpoint Pretrained_Weights/U-MV-small_latest.pth \
+  --input /data/orthos/block12_cog.tif --output /data/predictions/block12_crowns.gpkg \
+  --scratch-dir /tmp/geospatial_work --min-area 1.0 --save-prob
+
+python tools/batch_geospatial_inference.py \
+  --config configs/mambavision/U-MV-small.py --checkpoint Pretrained_Weights/U-MV-small_latest.pth \
+  --input-dir /data/orthos --output-dir /data/predictions --scratch-dir /tmp/geospatial_work --skip-existing
 ```
-**Notes**
-- The script recursively walks through subfolders within the '--input-folder' and processes each georeferenced image found.  
-- Output vector files mirror the input folder structure.  
 
+Parameters, channel-order caveat and output attributes:
+[docs/05_inference.md](docs/05_inference.md).
 
----
+## Pretrained weights
+
+| Variant | Encoder | File (Git LFS) | Size |
+|---|---|---|---|
+| U-MV-tiny | MambaVision-T-1K (80/160/320/640) | `Pretrained_Weights/U-MV-tiny_latest.pth` | 159 MB |
+| U-MV-small | MambaVision-S-1K (96/192/384/768) | `Pretrained_Weights/U-MV-small_latest.pth` | 234 MB |
+| U-MV-base | MambaVision-B-1K (128/256/512/1024) | `Pretrained_Weights/U-MV-base_latest.pth` | 422 MB |
+
+`python tools/inspect_checkpoint.py <file>.pth` identifies the variant of any
+local checkpoint. Checkpoints and training configs from the original
+MMSegmentation work directories (`best_mIoU_iter_*.pth`,
+`mambavision-*_generic-unet_acacia.py`) are accepted directly by every tool;
+legacy configs are translated on load by `umv.compat.load_config`. See
+[Pretrained_Weights/README.md](Pretrained_Weights/README.md) and
+[docs/08_handover_checklist.md](docs/08_handover_checklist.md).
+
+## Reproducibility and hand-over
+
+- Consolidated hand-over report (PDF, 26 pages): [docs/U-MV_Technical_Handover_Guide.pdf](docs/U-MV_Technical_Handover_Guide.pdf); regenerate with `python tools/build_handover_pdf.py`
+- Paper-to-config mapping and known discrepancies: [docs/07_reproducibility.md](docs/07_reproducibility.md)
+- Step-by-step hand-over checklist: [docs/08_handover_checklist.md](docs/08_handover_checklist.md)
+- Troubleshooting: [docs/06_troubleshooting.md](docs/06_troubleshooting.md)
+- What changed in this revision and why: [docs/REVISION_NOTES.md](docs/REVISION_NOTES.md)
+- Frozen environment of the original experiments: `docs/reference/environment.frozen.yml`
 
 ## Citation
 
-If you find this repository or the U-MV framework useful in your research, please cite our paper::
-
-> **Regional-Scale Acacia tortilis Crown Mapping from UAV Remote Sensing Using Semi‑Automated Annotation and a Lightweight Hybrid Segmentation Framework**  
->  Gibril M.B.A. *et al.*, 2026.
-
 ```bibtex
-@article{Gibril2026UMVAcacia,
-  title = {Regional-scale Acacia tortilis crown mapping from UAV remote sensing using semi-automated annotation and a lightweight hybrid segmentation framework},
-  author = {Gibril, Mohamed Barakat A. and others},
+@article{Gibril2026UMV,
+  title   = {Regional-scale Acacia tortilis crown mapping from UAV remote sensing using semi-automated annotation and a lightweight hybrid segmentation framework},
+  author  = {Gibril, Mohamed Barakat A. and Al-Ruzouq, Rami and Shanableh, Abdallah and Lamghari, Fouad and El-Keblawy, Ali and Hammouri, Nezar and Makawy, Safa and Jena, Ratiranjan and Mansour, Ahmed and Ghebremeskel, Simon Zerisenay and Alafayfeh, Nedal Salem and Almarzooqi, Mohamed Abdulrhaim},
   journal = {International Journal of Applied Earth Observation and Geoinformation},
-  year = {2026},
-  doi = {https://doi.org/10.1016/j.jag.2026.105214}
+  volume  = {148},
+  pages   = {105214},
+  year    = {2026},
+  doi     = {10.1016/j.jag.2026.105214}
 }
 ```
 
----
+Code archive: Zenodo, https://doi.org/10.5281/zenodo.18068379.
 
-## License
+## License and acknowledgements
 
-Specify your license (e.g., **Apache-2.0**) in `LICENSE`.
+Released under the MIT License (see `LICENSE`). Built on
+[MMSegmentation](https://github.com/open-mmlab/mmsegmentation) (Apache-2.0;
+`tools/train.py` and `tools/test.py` are vendored from v1.2.2) and
+[MambaVision](https://github.com/NVlabs/MambaVision) (NVIDIA Source Code
+License-NC for the pretrained encoders, distributed via the Hugging Face Hub).
+UAV data were provided by the UAE Ministry of Climate Change and Environment;
+the work was supported by the Fujairah Research Centre (Project No. 133049)
+and the University of Sharjah.
 
----
-
-## 🙏Acknowledgments
-
-
-We gratefully acknowledge the foundational work of:
-
-- **MMSegmentation (OpenMMLab):** the semantic segmentation toolbox on which this project is built.  
-  https://github.com/open-mmlab/mmsegmentation
-
-- **MambaVision (NVLabs):** for providing the MambaVision backbones used in our framework.  
-  https://github.com/NVlabs/MambaVision
-
-- **Hugging Face:** for hosting and enabling access to the pretrained MambaVision model weights.  
-  https://huggingface.co/nvidia
-
+Contact: Mohamed Barakat A. Gibril, mbgibril@sharjah.ac.ae.

@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- U-MV project ---
+.idea/
+work_dirs/
+data/
+*.gpkg
+*.tmp.tif
+*.mmap
+hf_cache/
+docker/.env
