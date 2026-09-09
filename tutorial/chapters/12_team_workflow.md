@@ -51,8 +51,6 @@ with the dataset.
 | 6 | held-out region evaluation and a mapped orthomosaic | test table, GeoPackage in QGIS |
 | 7 | written report with the experiment record | `projects/<name>/README.md` |
 
-## 12.5 Upgrades and getting help
-
 Upgrading MMSegmentation or PyTorch means rebuilding the image, rerunning
-`tests/` and re-evaluating U-MV-small on `test2` (85.4 % mIoU). When asking
-for help, give the command, the config, the log tail and `verify_install.py`.
+`tests/` and re-evaluating U-MV-small on `test2` (85.4 % mIoU). Ask for help
+with the command, the config, the log tail and `verify_install.py` output.
