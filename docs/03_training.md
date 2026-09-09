@@ -19,9 +19,11 @@ files; nothing is hard-coded in Python.
 | Checkpointing | every 5 000 iterations, plus `best_mIoU_iter_*.pth` on validation mIoU | `default_hooks.checkpoint` |
 | Test-time inference | sliding window 1024 × 1024, stride 512 | `model.test_cfg` |
 
-The tiny configuration keeps the hyper-parameters with which the released
-U-MV-tiny checkpoint was trained (lr 1e-5, 150 000 iterations); see
-`docs/07_reproducibility.md` for the rationale.
+All three variants share this schedule; the training logs of the released
+checkpoints confirm it (`docs/07_reproducibility.md`, §7.2). Note that the
+archived training split is a pruned subset (4 893 of the 26 615 tiles used
+for the published models), so retraining from the hand-over folder will not
+reach the published accuracy exactly.
 
 ## 3.2 Commands
 

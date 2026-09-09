@@ -25,10 +25,11 @@ Practical notes on the folder:
   share; training reads ~30 000 tiles per epoch. Excluding ArcGIS side-cars
   (`*.tif.aux.xml`, `*.tif.ovr`) during the copy saves space; the code ignores
   them either way.
-* The archived `train` split contains 4 893 tiles; the published model was
-  trained on 26 615. Evaluation and inference are complete with this folder;
-  retraining to the published accuracy needs the full training set (location
-  being confirmed; see `docs/07_reproducibility.md`, item 7).
+* The archived `train` split contains 4 893 tiles; the published models were
+  trained on 26 615, and the folder was pruned after training (no fuller copy
+  exists). Evaluation and inference are complete with this folder; retraining
+  reproduces the recipe, not the published model (`docs/07_reproducibility.md`,
+  §7.2, item 7).
 * The in-distribution test split is named `test2`. Nothing needs renaming;
   evaluation commands pass `--test-split test2`.
 * The archived `.py` configs reference the previous code layout. They load
