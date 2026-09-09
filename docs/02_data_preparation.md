@@ -47,7 +47,21 @@ python tools/train.py configs/mambavision/U-MV-small.py \
                 test_dataloader.dataset.data_root=/data/UAV_Acacia
 ```
 
-## 2.3 Quick integrity check
+## 2.3 Integrity check
+
+```bash
+python tools/check_dataset.py /data --splits train val test2 Generalizability
+```
+
+reports pair counts, tile sizes, dtypes, mask values and ArcGIS side-car files
+(`*.tif.aux.xml`, `*.tif.ovr`) per split. Side-cars are created when tiles are
+opened in ArcGIS Pro; the loader ignores them (only files ending in `.tif` are
+listed), but they can be deleted from working copies to save space.
+
+A split whose folder is not named `test` (for example `test2`) is evaluated
+without renaming: `python tools/test.py <config> <ckpt> --test-split test2`.
+
+### Manual check
 
 ```python
 import numpy as np, rasterio, glob, os
@@ -72,7 +86,26 @@ for split in ['train', 'val', 'test', 'Generalizability']:
 3. Convert masks to 8-bit unsigned (`Copy Raster`, pixel type 8_BIT_UNSIGNED)
    and verify with the script above.
 
-## 2.5 Orthomosaics for regional inference
+## 2.5 Archive versus working copy
+
+The archival dataset on the shared drive (`Z:\...\A.tortilis_Data & Model\Data
+used to build the model\img_dir`) should be left untouched. For training and
+evaluation make a working copy on a local disk, because random reads of ~30 000
+tiles per epoch over SMB (or through WSL2's `drvfs`) starve the GPU:
+
+```powershell
+# Windows PowerShell: local working copy without ArcGIS side-cars (~80 GB for train)
+robocopy "Z:\Final Geodatabase\Vegetation_Geodatabase\3_Mapping Acacia tortilis Trees\A.tortilis_Data & Model\Data used to build the model" `
+         "D:\UAV_Acacia_Data" /E /XF *.aux.xml *.ovr *.xml /MT:16
+```
+
+Then mount it in the container with `DATA_DIR=/mnt/d/UAV_Acacia_Data`. If the
+shared drive must be read directly, mount it in WSL2 first
+(`sudo mkdir -p /mnt/z && sudo mount -t drvfs Z: /mnt/z`) and quote the path,
+since it contains spaces and an ampersand:
+`DATA_DIR="/mnt/z/Final Geodatabase/.../Data used to build the model"`.
+
+## 2.6 Orthomosaics for regional inference
 
 Inference operates on whole orthomosaics. Convert them to Cloud-Optimised
 GeoTIFF (COG) once; windowed reads are then efficient from any storage:

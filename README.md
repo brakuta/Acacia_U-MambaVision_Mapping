@@ -55,7 +55,7 @@ tools/
 ├── train.py, test.py        MMSegmentation v1.2.2 entry points (+ --test-split)
 ├── geospatial_inference.py  one orthomosaic -> crown polygons
 ├── batch_geospatial_inference.py   folder tree -> crown polygons
-├── verify_install.py, inspect_checkpoint.py, download_backbones.py
+├── verify_install.py, inspect_checkpoint.py, download_backbones.py, check_dataset.py
 docker/                      Dockerfile · docker-compose.yml · run.sh
 requirements/                core.txt · geo.txt · mamba.txt · dev.txt
 Pretrained_Weights/          released checkpoints (Git LFS) + README
