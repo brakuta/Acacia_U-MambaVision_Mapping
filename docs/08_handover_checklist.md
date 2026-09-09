@@ -13,8 +13,8 @@ A.tortilis_Data & Model/
     ├── mambavision-t_generic-unet_acacia/
     ├── mambavision-s_generic-unet_acacia-88/
     └── mambavision-b_generic-unet_acacia/
-        ├── mambavision-*_generic-unet_acacia.py   exact training config of the published run
-        ├── best_mIoU_iter_*.pth                   checkpoint used for the paper's test results
+        ├── mambavision-*_generic-unet_acacia.py   training config of the published run
+        ├── best_mIoU_iter_*.pth                   checkpoint of record (paper's test results)
         ├── iter_100000.pth                        last iteration
         └── <timestamp>/                           logs, vis_data/scalars.json
 ```
@@ -67,7 +67,7 @@ need not be known:
 
 ```bash
 --checkpoint "/weights/mambavision-t_generic-unet_acacia"      # tiny
---checkpoint "/weights/mambavision-s_generic-unet_acacia-88"   # small (-88 = validation mIoU 88.02 %)
+--checkpoint "/weights/mambavision-s_generic-unet_acacia-88"   # small (-88: val. mIoU 88.02 %)
 --checkpoint "/weights/mambavision-b_generic-unet_acacia"      # base
 ```
 

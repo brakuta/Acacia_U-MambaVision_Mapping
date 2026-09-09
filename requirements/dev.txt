@@ -1,2 +1,3 @@
 pytest>=7
 flake8>=6
+reportlab>=4        # tools/build_handover_pdf.py

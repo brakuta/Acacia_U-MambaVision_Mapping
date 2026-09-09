@@ -146,6 +146,7 @@ legacy configs are translated on load by `umv.compat.load_config`. See
 
 ## Reproducibility and hand-over
 
+- Consolidated hand-over report (PDF, 26 pages): [docs/U-MV_Technical_Handover_Guide.pdf](docs/U-MV_Technical_Handover_Guide.pdf); regenerate with `python tools/build_handover_pdf.py`
 - Paper-to-config mapping and known discrepancies: [docs/07_reproducibility.md](docs/07_reproducibility.md)
 - Step-by-step hand-over checklist: [docs/08_handover_checklist.md](docs/08_handover_checklist.md)
 - Troubleshooting: [docs/06_troubleshooting.md](docs/06_troubleshooting.md)
