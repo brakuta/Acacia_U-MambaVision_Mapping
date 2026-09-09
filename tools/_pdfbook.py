@@ -63,8 +63,8 @@ S = {
                               alignment=TA_CENTER, textColor=GREY, spaceBefore=4, spaceAfter=10),
     'note': ParagraphStyle('note', fontName='Serif-Italic', fontSize=9.5, leading=12.5, textColor=GREY,
                            spaceAfter=6),
-    'toc1': ParagraphStyle('toc1', fontName='Sans-Bold', fontSize=10.5, leading=15, leftIndent=0),
-    'toc2': ParagraphStyle('toc2', fontName='Serif', fontSize=10, leading=13.5, leftIndent=14),
+    'toc1': ParagraphStyle('toc1', fontName='Sans-Bold', fontSize=9.6, leading=12.4, leftIndent=0, spaceBefore=1),
+    'toc2': ParagraphStyle('toc2', fontName='Serif', fontSize=9.2, leading=11.2, leftIndent=14),
     'cover_t': ParagraphStyle('cover_t', fontName='Sans-Bold', fontSize=24, leading=30, textColor=ACCENT,
                               alignment=TA_LEFT),
     'cover_s': ParagraphStyle('cover_s', fontName='Serif', fontSize=13, leading=18, textColor=INK),
@@ -121,8 +121,11 @@ def make_table(rows):
     body = [r + [''] * (ncol - len(r)) for r in body]
     lens = [max(len(r[c]) for r in [header] + body) for c in range(ncol)]
     weights = [min(max(n, 8), 140) ** 0.8 for n in lens]
+    codey = [any('`' in r[c] for r in body) for c in range(ncol)]
+    mins = [min(2.9 * cm, 0.18 * cm * (lens[c] + 2)) if codey[c] else 1.6 * cm for c in range(ncol)]
+    free = AVAIL_W - sum(mins)
     tot = sum(weights)
-    widths = [AVAIL_W * w / tot for w in weights]
+    widths = [m + free * w / tot for m, w in zip(mins, weights)]
     data = [[Paragraph(inline(c), S['cellh']) for c in header]]
     for r in body:
         data.append([Paragraph(inline(c), S['cell']) for c in r])
@@ -242,6 +245,13 @@ def md_to_flowables(md: str, skip_h1=False):
             else:
                 num_items.append(item)
             i = j; continue
+        m = re.match(r'^!\[([^\]]*)\]\(([^)]+)\)\s*$', ln)
+        if m:
+            flush_para(); flush_lists()
+            out.append(image(ROOT / m.group(2), 0.9))
+            if m.group(1):
+                out.append(Paragraph(inline(m.group(1)), S['caption']))
+            i += 1; continue
         if ln.startswith('>'):
             flush_para(); flush_lists()
             out.append(Paragraph(inline(ln.lstrip('> ')), S['note'])); i += 1; continue

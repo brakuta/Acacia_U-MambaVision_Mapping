@@ -76,14 +76,21 @@ the location of the hand-over folder.
   the workstation and report any deviation.
 * Numerical equivalence of the released checkpoints with the paper's metrics.
 
+## Resolved from the recovered work directories (September 2026)
+
+* The tiny configuration has been aligned with its training log (lr 1e-4,
+  100 000 iterations); the previously released tiny config did not match the
+  run.
+* The released checkpoints are the best-validation checkpoints (SHA-256
+  verified against `best_mIoU_iter_{100000,95000,60000}.pth`).
+* The archived training split (4 893 tiles) is a pruned subset of the 26 615
+  tiles used for the published models; no fuller copy exists on the project
+  disks. Evaluation and inference are exact; retraining reproduces the recipe.
+
 ## Decisions left to the authors
 
-1. Whether to harmonise the tiny configuration with the 100k schedule
-   (`docs/07_reproducibility.md`, §7.2).
-2. Whether to publish the checkpoints on Zenodo/Hugging Face in addition to
+1. Whether to publish the checkpoints on Zenodo/Hugging Face in addition to
    Git LFS (bandwidth quota of GitHub LFS is 1 GB month⁻¹ on free plans; three
    full downloads exhaust it).
-4. Location of the complete training set (26 615 tiles); the archived folder
-   contains 4 893.
-3. Whether regional maps produced with the earlier BGR-swapped scripts should
+2. Whether regional maps produced with the earlier BGR-swapped scripts should
    be regenerated.

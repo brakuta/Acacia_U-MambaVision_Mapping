@@ -76,11 +76,13 @@ def test_multispectral_pipeline_end_to_end(tmp_path):
     ds_cfg.data_root = str(root)
     ds_cfg.pipeline[3]['crop_size'] = (64, 64)      # RandomCrop
     ds_cfg.pipeline[2]['scale'] = (64, 64)          # RandomResize
+    ds_cfg.pipeline[2]['ratio_range'] = (1.0, 1.0)  # deterministic size for the batch below
     ds = DATASETS.build(ds_cfg)
     assert len(ds) == 3
     item = ds[0]
-    assert tuple(item['inputs'].shape) == (10, 64, 64) and item['inputs'].dtype == torch.float32
-    assert item['data_samples'].gt_sem_seg.data.shape[-2:] == (64, 64)
+    # RandomResize may yield 63 px before the crop; the data preprocessor pads to the crop size
+    assert item['inputs'].shape[0] == 10 and max(item['inputs'].shape[1:]) <= 64 and item['inputs'].dtype == torch.float32
+    assert item['data_samples'].gt_sem_seg.data.shape[-2:] == tuple(item['inputs'].shape[1:])
     # batch through the data preprocessor and the 10-band model
     cfg.model.pretrained = None; cfg.model.backbone.init_cfg = None
     cfg.model.data_preprocessor.size = (64, 64)
@@ -113,3 +115,26 @@ def test_compare_runs_and_adapt_first_conv(tmp_path):
     new = torch.load(tmp_path / 'r50_10.pth', weights_only=False)['state_dict']['stem.0.weight']
     assert tuple(new.shape) == (32, 10, 3, 3)
     assert torch.allclose(new[:, 2], sd['stem.0.weight'][:, 0]) and torch.allclose(new[:, 0], sd['stem.0.weight'][:, 2])
+
+
+def test_make_tiles_spatial_split(tmp_path):
+    import subprocess, sys  # noqa: E401
+    W = H = 1024
+    img = np.random.randint(0, 255, (3, H, W), dtype=np.uint8)
+    mask = np.zeros((1, H, W), dtype=np.uint8); mask[0, 200:600, 300:700] = 1; mask[0, :64, :] = 255
+    tr = rasterio.transform.from_origin(500000, 2500000, 0.05, 0.05)
+    for name, arr, dt in (('ortho.tif', img, 'uint8'), ('labels.tif', mask, 'uint8')):
+        with rasterio.open(tmp_path / name, 'w', driver='GTiff', width=W, height=H, count=arr.shape[0], dtype=dt,
+                           crs='EPSG:32640', transform=tr) as d:
+            d.write(arr)
+    out = tmp_path / 'ds'
+    r = subprocess.run([sys.executable, os.path.join(ROOT, 'tools/make_tiles.py'), '--image', str(tmp_path / 'ortho.tif'),
+                        '--mask', str(tmp_path / 'labels.tif'), '--out', str(out), '--tile', '256', '--split-blocks', '2',
+                        '--val-frac', '0.25', '--test-frac', '0.25'], capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    n = {s: len(list((out / 'img_dir' / s).glob('*.tif'))) for s in ('train', 'val', 'test')}
+    assert sum(n.values()) == 16 and n['val'] == 4 and n['test'] == 4
+    t = next((out / 'img_dir' / 'train').glob('*.tif'))
+    with rasterio.open(t) as d, rasterio.open(out / 'ann_dir' / 'train' / t.name) as m:
+        assert d.crs.to_epsg() == 32640 and d.count == 3 and m.count == 1 and set(np.unique(m.read(1))) <= {0, 1, 255}
+    assert (out / 'tiles_index.csv').exists()
