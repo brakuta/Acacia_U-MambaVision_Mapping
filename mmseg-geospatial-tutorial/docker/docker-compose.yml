@@ -1,0 +1,27 @@
+# cp docker/.env.example docker/.env  (set DATA_DIR)
+# docker compose --env-file docker/.env -f docker/docker-compose.yml build
+# docker compose --env-file docker/.env -f docker/docker-compose.yml run --rm mmseg
+services:
+  mmseg:
+    image: mmseg-geospatial:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    working_dir: /workspace/tutorial
+    stdin_open: true
+    tty: true
+    ipc: host
+    environment:
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+      - GDAL_CACHEMAX=2048
+    volumes:
+      - ..:/workspace/tutorial                      # live source tree: projects/, work_dirs/
+      - ${DATA_DIR:-./data}:/data                   # datasets: /data/<project>
+      - ${WEIGHTS_DIR:-./work_dirs/pretrained}:/weights:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

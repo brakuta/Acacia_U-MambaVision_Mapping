@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+work_dirs/
+data/
+docker/.env
+*.gpkg
+*.tmp.tif
+*.mmap
+.pytest_cache/

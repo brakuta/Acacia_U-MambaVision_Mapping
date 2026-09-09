@@ -1,0 +1,21 @@
+# Install AFTER torch/torchvision and mmcv (see chapter 2 / docker/Dockerfile).
+mmengine==0.10.7
+mmsegmentation==1.2.2
+numpy>=1.26,<2.3
+opencv-python==4.11.0.86
+pillow>=10
+scipy>=1.11
+matplotlib>=3.7
+prettytable>=3.5
+tqdm>=4.65
+ftfy
+regex
+# geospatial (GDAL Python bindings come from conda-forge in the Docker image)
+rasterio>=1.3.9
+geopandas>=0.14
+shapely>=2.0
+pyproj>=3.6
+pyogrio>=0.7
+# optional
+timm>=1.0          # TIMMBackbone
+tensorboard

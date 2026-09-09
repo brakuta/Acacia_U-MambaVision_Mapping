@@ -144,14 +144,6 @@ legacy configs are translated on load by `umv.compat.load_config`. See
 [Pretrained_Weights/README.md](Pretrained_Weights/README.md) and
 [docs/08_handover_checklist.md](docs/08_handover_checklist.md).
 
-## Tutorial for new projects
-
-`tutorial/` is a course on MMSegmentation for geospatial imagery (environment,
-anatomy of the library, configs, data preparation, RGB and multispectral
-pipelines, model selection, training, evaluation, GIS export), with a project
-template and four tested example projects; PDF:
-[docs/MMSegmentation_Geospatial_Tutorial.pdf](docs/MMSegmentation_Geospatial_Tutorial.pdf).
-
 ## Reproducibility and hand-over
 
 - Consolidated hand-over report (PDF, 26 pages): [docs/U-MV_Technical_Handover_Guide.pdf](docs/U-MV_Technical_Handover_Guide.pdf); regenerate with `python tools/build_handover_pdf.py`

@@ -1,0 +1,5 @@
+.git
+work_dirs
+data
+**/__pycache__
+docs/*.pdf
